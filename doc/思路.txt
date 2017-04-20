@@ -1,0 +1,46 @@
+mvvm并没有实现真正的model-view统一，当dom直接被修改时，model并没有被刷新
+
+谷歌实现了浏览器端的vdom，按照标准只有在一个task之后才进行dom的更新,vue vnode迟早被切割;
+实现真正的mvvm,并实现watch
+1,节点类型
+	EmptyVNode:空节点
+	TextVNode:文本节点
+	AttrVNode:属性节点
+	ElementVNode:普通元素节点
+	CloneVNode:克隆节点(保证和被克隆节点一致性)
+
+1,zepto.js
+
+一：如何编译template
+1,预编译
+2,更快的字符串相加方式:很多人误以为数组 push 方法拼接字符串会比 += 快，要知道这仅仅是 IE6-8 的浏览器下。实测表明现代浏览器使用 += 会比数组 push 方法快，而在 v8 引擎中，使用 += 方式比数组拼接快 4.7 倍。
+3,状态机,寻找分隔符
+<div>{{text}}</div>
+
+API:
+	new MVVM({
+		splitstart:"{{",
+		splitend:"}}"
+		data:{
+			b:'123123',
+			c:Node('<span></span>')  
+			c:tempalte,
+			d:{
+				async:0,1,2,3//nexttick()，
+				template:'src'/element,
+				beforeMount:function(ele){ return false;(cancle)},
+				afterMounted:function(ele){},
+				watch:function(){}
+			},
+			e:{
+				watch:function(){};
+				tempalte:'123',
+			}
+		},
+		watch:{
+			a:function(){
+
+			}
+		}
+
+	})

@@ -1,0 +1,19 @@
+{
+  "name": "asd",
+  "version": "0.0.1",
+  "description": "",
+  "main": "webpack.config.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^6.4.1",
+    "webpack": "^2.4.1"
+  }
+}
