@@ -7,13 +7,18 @@
     "doc": "doc"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config ./build/webpack.config.js",
+    "dev":"webpack-dev-server --inline --config ./build/webpack.config.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^6.4.1",
+    "html-webpack-plugin": "^2.28.0",
     "webpack": "^2.4.1"
+  },
+  "dependencies": {
+    "webpack-dev-server": "^2.4.2"
   }
 }
