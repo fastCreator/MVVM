@@ -1,17 +1,17 @@
 'use strict'
 
-const webpack = require('webpack') 
-const path = require('path') 
+const webpack = require('webpack')
+const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: './src/index.js',
   output: {
-     path: path.resolve(__dirname,'../dist'),
-     filename: 'MVVM.js' 
+    path: path.resolve(__dirname, '../dist'),
+    filename: 'MVVM.js'
   }, 
   module: {
-    loaders: [ 
+    loaders: [
       {
         test: /\.js$/,
         loaders: ['babel-loader'],
@@ -19,14 +19,15 @@ module.exports = {
       }
     ]
   },
-  plugins:[
-    new HtmlWebpackPlugin({ 
+  plugins: [
+    new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'index.html'),
-      filename: 'test.html'
+      filename: 'test.html',
+      inject: 'head'
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],
   devServer: {
-        port:3000
+    port: 8090
   }
 }
