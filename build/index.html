@@ -2,26 +2,42 @@
 <html>
 
 <head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8" /> 
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 </head>
 
 <body>
   <div id="to"></div>
   <script id="app" type="text/html">
     <h1>{{title}}</h1>
-    <ul> 
-      <li m-for="(val, key, index) in arr">索引 {{i + 1}} ：{{value}}</li> 
+    <ul>
+      <li m-for="(val, key, index) in arr">索引 {{i + 1}} ：{{value}}</li>
     </ul>
+    <h2>{{title2}}</h2>
+    <h2>{{title3}}</h2>
   </script>
   <script>
-    new MVVM({
-      from:'app',
-      to:'#to',
-      splitStart:'{',
-      splitEnd:'}',
-      data:{
-        title:'标题',
-        arr:[1,2,3,4,5]
+    var vm = new MVVM({
+      from: 'app',
+      to: '#to',
+      splitStart: '{',
+      splitEnd: '}',
+      data: {
+        title: '标题',
+        obj: { a: { b: 2 } },
+        arr: [1, 2, 3, 4, 5]
+      },
+      computed: {
+        title2: function () {
+          return this.title + 1;
+        },
+        title3: {
+          get: function () {
+            return this.title + 1
+          },
+          set: function (v) {
+            this.title = v - 1
+          }
+        }
       }
     })  
   </script

@@ -1,9 +1,24 @@
-import { isObject } from '../utils'
+import { isObject, hasOwn, def, hasProto } from '../utils'
+import { arrayMethods } from './array'
+import Dep from './dep'
+const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 export class Observer {
     constructor(value) {
         this.value = value;
-        //this.dep = new Dep();
+        this.dep = new Dep();
         this.vmCount = 0;//$date的属性个数
+        def(value, '__ob__', this);
+        if (Array.isArray(value)) {
+            //判断是否能访问原型链上属性for兼容
+            const augment = hasProto
+                ? protoAugment
+                : copyAugment
+            //覆盖数组原生方法，触发notify
+            augment(value, arrayMethods, arrayKeys)
+            this.observeArray(value)
+        } else {
+            this.walk(value)
+        }
     }
     //只有当值为对象时，为每个属性添加getter/setters
     walk(obj) {
@@ -21,7 +36,7 @@ export class Observer {
 }
 
 export function defineReactive(obj, key, val, customSetter) {
-    //new dep = new Dep();
+    const dep = new Dep();
     const property = Object.getOwnPropertyDescriptor(obj, key)
     if (property && property.configurable === false) {
         return
@@ -36,15 +51,19 @@ export function defineReactive(obj, key, val, customSetter) {
         get: function reactiveGetter() {
             const value = getter ? getter.call(obj) : val
             //当有依赖关系时，收集依赖
-            // if (Dep.target) {
-            //     dep.depend()
-            //     if (childOb) {
-            //         childOb.dep.depend()
-            //     }
-            //     if (Array.isArray(value)) {
-            //         dependArray(value)
-            //     }
-            // }
+            if (Dep.target) {
+                //把自己添加到依赖
+                dep.depend()
+                if (childOb) { 
+                    //访问子的时候会冒泡去访问父
+                    //父会把子添加到__ob__，这个属性只是看看而已，没什么实际意义
+                    //会添加data属性下的所有对象离散集
+                    childOb.dep.depend()
+                }
+                if (Array.isArray(value)) {
+                    dependArray(value)
+                }
+            }
             return value
         },
         set: function reactiveSetter(newVal) {
@@ -60,7 +79,7 @@ export function defineReactive(obj, key, val, customSetter) {
             }
             childOb = observe(newVal)
             //触发更新
-            //dep.notify()
+            dep.notify()
         }
     })
 }
@@ -80,4 +99,15 @@ export function observe(value, asRootData) {
         ob.vmCount++
     }
     return ob
+}
+
+function protoAugment(target, src) {
+    target.__proto__ = src
+}
+
+function copyAugment(target, src, keys) {
+    for (let i = 0, l = keys.length; i < l; i++) {
+        const key = keys[i]
+        def(target, key, src[key])
+    }
 }
