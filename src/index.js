@@ -1,14 +1,13 @@
 import { initStatic } from './initStatic'
-import { initMixin } from './initMixin'
-import { initBody } from './initBody'
- import { bind} from './utils'
-function MVVM(options) { 
-    this._init(options);  
+import { initPrototype } from './initPrototype'
+import { initInstance } from './initInstance' 
+import { bind } from './utils'
+function MVVM(options) {
+    this._init(options);
 }
 
-initMixin(MVVM);
-// initBody(MVVM);
-// bind(options.to);
-// initStatic(MVVM);
+initPrototype(MVVM);
+initInstance(MVVM);  
+initStatic(MVVM);
 
 window.MVVM = MVVM; 

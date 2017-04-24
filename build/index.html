@@ -6,7 +6,9 @@
 </head>
 
 <body>
-  <div id="to"></div>
+  <div id="to">
+
+  </div>
   <script id="app" type="text/html">
     <h1>{{title}}</h1>
     <ul>
@@ -28,15 +30,21 @@
       },
       computed: {
         title2: function () {
-          return this.title + 1;
+          console.log(123);
+          return this.title + 2;
         },
         title3: {
           get: function () {
-            return this.title + 1
+            return this.title + 3
           },
           set: function (v) {
             this.title = v - 1
           }
+        }
+      },
+      watch: {
+        title3: function (o, n) {
+          console.log(o, n);
         }
       }
     })  

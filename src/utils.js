@@ -10,6 +10,7 @@
 //isDom
 //isObject
 //isNative
+//isPlainObject
 //hasOwn
 //生成
 //bind
@@ -20,6 +21,11 @@
 //操作对象
 //remove
 //parsePath
+
+const OBJECT_STRING = '[object Object]'
+export function isPlainObject(obj) {
+    return toString.call(obj) === OBJECT_STRING
+}
 
 export const isNative = function (Ctor) {
     return typeof Ctor === 'function' && /native code/.test(Ctor.toString())

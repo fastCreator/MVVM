@@ -75,6 +75,7 @@ export default class Watcher {
     //收集watcher依赖的dep对象
     addDep(dep) {
         const id = dep.id
+        //因为访问父的时候，会判断添加子依赖，
         if (!this.newDepIds.has(id)) {
             this.newDepIds.add(id)
             this.newDeps.push(dep)
@@ -128,8 +129,8 @@ export default class Watcher {
                 const oldValue = this.value
                 this.value = value
                 if (this.user) {
-                    try {
-                        this.cb.call(this.vm, value, oldValue)
+                    try { 
+                        this.cb.call(this.vm, value, oldValue);
                     } catch (e) {
                         warn(`callback for watcher "${this.expression}"`)
                     }

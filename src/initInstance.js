@@ -1,5 +1,8 @@
 import { observe } from './observer/index';
-import { noop, warn } from './utils';
+import Dep from './observer/dep';
+import Watcher from './observer/watcher';
+import { initDom } from './dom/initDom'
+import { noop, warn, isPlainObject } from './utils';
 
 const sharedPropertyDefinition = {
     enumerable: true,
@@ -8,29 +11,60 @@ const sharedPropertyDefinition = {
     set: noop
 }
 
-export function initMixin(MVVM) {
+export function initInstance(MVVM) {
     MVVM.prototype._init = function (opt) {
+        this._watchers = [];
         this.$options = opt;
-        initState(this);
+        initData(this);
         initComputed(this);
+        initWatch(this);
+        initDom(this);
     }
 }
 
-function initState(vm) {
-    vm._watchers = [];
-    initData(vm)
-    bind(vm);
+function initWatch(vm) {
+    var watch = vm.$options.watch;
+    if (watch) {
+        for (const key in watch) {
+            const handler = watch[key]
+            if (Array.isArray(handler)) {
+                for (let i = 0; i < handler.length; i++) {
+                    createWatcher(vm, key, handler[i])
+                }
+            } else {
+                createWatcher(vm, key, handler)
+            }
+        }
+    }
 }
 
+function createWatcher(vm, key, handler) {
+    let options
+    //是个对象时，主要为了写deep属性
+    if (isPlainObject(handler)) {
+        options = handler
+        handler = handler.handler
+    }
+    //直接写方法名时 
+    if (typeof handler === 'string') {
+        handler = vm[handler]
+    }
+    vm.$watch(key, handler, options)
+}
+
+
+
+//初始化计算属性
 const computedWatcherOptions = { lazy: true }
 function initComputed(vm) {
-    //const watchers = vm._computedWatchers = Object.create(null)
     var computed = vm.$options.computed;
+    if (!computed) return;
+    const watchers = vm._computedWatchers = Object.create(null)
     for (const key in computed) {
         const userDef = computed[key]
         let getter = typeof userDef === 'function' ? userDef : userDef.get
 
-        //watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions)
+        watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions)
         if (!(key in vm)) {
             defineComputed(vm, key, userDef)
         } else {
@@ -39,7 +73,7 @@ function initComputed(vm) {
     }
 
 }
-
+//定义当个计算属性
 export function defineComputed(target, key, userDef) {
     if (typeof userDef === 'function') {
         sharedPropertyDefinition.get = createComputedGetter(key)
@@ -54,9 +88,10 @@ export function defineComputed(target, key, userDef) {
             ? userDef.set
             : noop
     }
+    //在VM上绑定computed
     Object.defineProperty(target, key, sharedPropertyDefinition)
 }
-
+//创建计算属性默认get方法
 function createComputedGetter(key) {
     return function computedGetter() {
         const watcher = this._computedWatchers && this._computedWatchers[key]
@@ -71,7 +106,7 @@ function createComputedGetter(key) {
         }
     }
 }
-
+//初始化data属性
 function initData(vm) {
     var data = vm.$options.data;
     if (data) {
@@ -89,28 +124,7 @@ function initData(vm) {
     observe(data, true);
 }
 
-function bind(vm) {
-    //Object.assign(vm, vm.$options.data);
-    for (var i in vm.$options.data) {
-        vm[i] = vm.$options.data[i]
-    }
-}
-//计算属性get
-function createComputedGetter(key) {
-    return function computedGetter() {
-        const watcher = this._computedWatchers && this._computedWatchers[key]
-        if (watcher) {
-            if (watcher.dirty) {
-                watcher.evaluate()
-            }
-            if (Dep.target) {
-                watcher.depend()
-            }
-            return watcher.value
-        }
-    }
-}
-//data get/set
+//代理 在vm上直接访问$date上面的data
 export function proxy(target, sourceKey, key) {
     sharedPropertyDefinition.get = function proxyGetter() {
         return this[sourceKey][key]
