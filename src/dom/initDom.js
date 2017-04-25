@@ -8,74 +8,98 @@ export function initDom(vm) {
     parse(temp, ss, se);
 
 }
-// {
-//     bind:'title',
-//     selector:[]
-// }
+
 function parse(temp, ss, se) {
     var str = '', expression = '', selector = [], nowTag = '';
     var stateM = new ManyStateMachine(temp);
-    stateM.load('bind', 'bindNormal', { bindNormal: bindNormal, bindStart: bindStart, bindEnd: bindEnd });
-    stateM.load('tag', 'tempSNormal', { tempSNormal: tempSNormal, tempSStart: tempSStart, tagPush: tagPush, tagPop: tagPop });
+    stateM.load('bind', 'bindOther', { bindOther: bindOther, bindStart: bindStart, bindDoing: bindDoing, bindEnd: bindEnd });
+    stateM.load('tag', 'tagOther', { tagOther: tagOther, tagStart: tagStart, tagDoing: tagDoing, tagPush: tagPush, tagPop: tagPop });
+    stateM.loadHandle(handle);
     stateM.start();
-    console.log(str)
-    //绑定
-    function bindNormal(temp, item, i, to) {
-        if (item == ss && temp[i + 1] == ss) {
-            to('bindStart');
-            return i + 1;
-        }
-        str += item;
-    }
+    console.log(str);
 
-    function bindStart(temp, item, i, to) {
-        if (item == se && temp[i + 1] == se) {
-            to('bindEnd');
-            return i + 1;
+    function handle(states, temp, item, i) {
+        var count = 0;
+        var bindState = states.bind, tagState = states.tag;
+        if (bindState == 'bindOther') {
+            str += item;
+        } else if (bindState == 'bindDoing') {
+            expression += item
+        } else if (bindState == 'bindEnd') {
+            //console.log(expression);
+            expression = '';
         }
-        expression += item;
-    }
 
-    function bindEnd(temp, item, i, to) {
-        expression = '';
-        str += item;
-        to('bindNormal')
-    }
-    //标签
-    function tempSNormal(temp, item, i, to) {
-        if (item == '<') {
-            to('tempSStart')
-        }
-    }
 
-    function tempSStart(temp, item, i, to) {
-        if (item == '>') {
-            to('tagPush');
-        } else if (item == '/') {
-            to('tagPop');
-        } else {
+        if (tagState == 'tagOther') {
+
+        } else if (tagState == 'tagStart') {
+            nowTag = '';
+        } else if (tagState == 'tagDoing') {
             nowTag += item;
+        } else if (tagState == 'tagPush') {
+            selector.push(nowTag);
+            console.log('push:' + nowTag)
+        } else if (tagState == 'tagPop') {
+            console.log('pop:' + selector.pop());
+        }
+        return i + count;
+    }
+
+    //绑定
+    function bindOther(temp, item, i) {
+        if (temp[i + 1] == ss && temp[i + 2] == ss) {
+            return 'bindStart';
         }
     }
 
-    function tagPush(temp, item, i, to) {
-        selector.push(nowTag);
-        console.log('push:' + nowTag);
-        nowTag = '';
-        to('tempSNormal');
+    function bindStart(temp, item, i) {
+        if (item == ss && temp[i - 1] == ss) {
+            return 'bindDoing';
+        }
     }
 
-    function tagPop(temp, item, i, to) {
-        console.log('pop:' + selector.pop());
-        nowTag = '';
-        to('tempSNormal');
+    function bindDoing(temp, item, i) {
+        if (temp[i + 1] == se && temp[i + 2] == se) {
+            return 'bindEnd';
+        }
+    }
+
+    function bindEnd(temp, item, i) {
+        if (item == se && temp[i - 1] == se) {
+            return 'bindOther';
+        }
+        if (temp[i + 1] == ss && temp[i + 2] == ss) {
+            return 'bindStart';
+        }
+    }
+
+    //标签
+    function tagOther(temp, item, i) {
+        if (temp[i + 1] == '<') {
+            return 'tagStart'
+        }
+    }
+
+    function tagStart(temp, item, i) {
+        if (temp[i + 1] == '/') {
+            return 'tagPop';
+        }
+        return 'tagDoing';
+    }
+
+    function tagDoing(temp, item, i) {
+        if (temp[i + 1] == '>') {
+            return 'tagPush';
+        }
+    }
+
+    function tagPush(temp, item, i) {
+        return 'tagOther'
+    }
+
+    function tagPop(temp, item, i) {
+        return 'tagOther'
     }
 }
-
-//多状态机
-//
-//bindStart bindEnd
-//tagStart tagEnd
-//directiveStart tagEnd
-
-//绑定，标签，指令
+//指令

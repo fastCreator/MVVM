@@ -2,14 +2,22 @@ export default class ManyStateMachine {
     constructor(temp) {
         this.temp = temp || '';//解析模板 
         this.i = 0;//模板读取位置 
-        this.allFuc = {}; //记录所有函数
-        this.allState = {};//记录所有状态
+        this.allFuc = {}; //状态切换函数队列
+        this.allState = {};//记录所有状态 
+        this.stateHandle = function noon() { };//状态处理函数
     }
     _run() {
-        for (var taskName in this.allFuc) {
-            let myfucs = this.allFuc[taskName], myState = this.allState[taskName],
-                count = myfucs[myState].call(this, this.temp, this.temp[this.i], this.i, this.to(taskName));
-            if (count != undefined) this.i = count;
+        //运行状态切换函数队列
+        var taskName, newAllState = {};
+        for (taskName in this.allFuc) {
+            let myfucs = this.allFuc[taskName], myState = this.allState[taskName];
+            newAllState[taskName] = myfucs[myState].call(this, this.temp, this.temp[this.i], this.i);
+        }
+        var count = this.stateHandle.call(this, this.allState, this.temp, this.temp[this.i], this.i);
+        if (count != undefined) this.i = count;
+        for (taskName in newAllState) {
+            let state = newAllState[taskName];
+            state && (this.allState[taskName] = state);
         }
         if (++this.i < this.temp.length) this._run();
     }
@@ -25,11 +33,8 @@ export default class ManyStateMachine {
         entry && (this.allState[taskName] = entry);
     }
 
-    to(taskName) {
-        var allState = this.allState;
-        return function (state) {
-            allState[taskName] = state;
-        }
+    loadHandle(handle) {
+        this.stateHandle = handle;
     }
 }
 
