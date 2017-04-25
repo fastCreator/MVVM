@@ -8,48 +8,67 @@ export function initDom(vm) {
     parse(temp, ss, se);
 
 }
-
+// {
+//     bind:'title',
+//     selector:[]
+// }
 function parse(temp, ss, se) {
-    var str = '', expression = '';
+    var str = '', expression = '', selector = [], nowTag = '';
     var stateM = new ManyStateMachine(temp);
-    stateM.load([bindNormal, bindStart, bindEnd]);
-    stateM.load([tempNormal, tempStart, tempEnd]);
+    stateM.load('bind', 'bindNormal', { bindNormal: bindNormal, bindStart: bindStart, bindEnd: bindEnd });
+    stateM.load('tag', 'tempSNormal', { tempSNormal: tempSNormal, tempSStart: tempSStart, tagPush: tagPush, tagPop: tagPop });
     stateM.start();
-
+    console.log(str)
     //绑定
-    function bindNormal(temp, item, i, next) {
+    function bindNormal(temp, item, i, to) {
         if (item == ss && temp[i + 1] == ss) {
-            next();
+            to('bindStart');
             return i + 1;
         }
         str += item;
     }
 
-    function bindStart(temp, item, i, next) {
+    function bindStart(temp, item, i, to) {
         if (item == se && temp[i + 1] == se) {
-            next();
+            to('bindEnd');
             return i + 1;
         }
         expression += item;
     }
 
-    function bindEnd(temp, item, i, next) {
-        console.log(expression);
+    function bindEnd(temp, item, i, to) {
         expression = '';
         str += item;
-        next();
+        to('bindNormal')
     }
     //标签
-    function tempNormal(temp, item, i, next) {
-
+    function tempSNormal(temp, item, i, to) {
+        if (item == '<') {
+            to('tempSStart')
+        }
     }
 
-    function tempStart(temp, item, i, next) {
-
+    function tempSStart(temp, item, i, to) {
+        if (item == '>') {
+            to('tagPush');
+        } else if (item == '/') {
+            to('tagPop');
+        } else {
+            nowTag += item;
+        }
     }
 
-    function tempEnd(temp, item, i, next) {
+    function tagPush(temp, item, i, to) {
+        selector.push(nowTag);
+        console.log('push:' + nowTag);
+        nowTag = '';
+        to('tempSNormal');
+    }
 
+    function tagPop(temp, item, i, to) {
+        console.log('pop:' + selector.pop());
+        nowTag = '';
+        to('tempSNormal');
     }
 }
 
