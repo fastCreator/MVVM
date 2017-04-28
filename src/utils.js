@@ -2,6 +2,7 @@
 //hasProto
 //定义
 //noop
+//no
 //def
 //转换
 //domTostr
@@ -11,6 +12,7 @@
 //isObject
 //isNative
 //isPlainObject
+//isNonPhrasingTag
 //hasOwn
 //生成
 //bind
@@ -21,6 +23,43 @@
 //操作对象
 //remove
 //parsePath
+
+
+
+
+
+function copyProperties(target, source) {
+    for (let key of Reflect.ownKeys(source)) {
+        if (key !== "constructor"
+            && key !== "prototype"
+            && key !== "name"
+        ) {
+            let desc = Object.getOwnPropertyDescriptor(source, key);
+            Object.defineProperty(target, key, desc);
+        }
+    }
+}
+//标签
+export const isNonPhrasingTag = makeMap(
+    'address,article,aside,base,blockquote,body,caption,col,colgroup,dd,' +
+    'details,dialog,div,dl,dt,fieldset,figcaption,figure,footer,form,' +
+    'h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,legend,li,menuitem,meta,' +
+    'optgroup,option,param,rp,rt,source,style,summary,tbody,td,tfoot,th,thead,' +
+    'title,tr,track'
+)
+//创建一个映射并返回一个函数，以检查键是否在该映射中。
+export function makeMap(str, expectsLowerCase) {
+    const map = Object.create(null)
+    const list = str.split(',')
+    for (let i = 0; i < list.length; i++) {
+        map[list[i]] = true
+    }
+    return expectsLowerCase
+        ? val => map[val.toLowerCase()]
+        : val => map[val]
+}
+
+export const no = () => false
 
 const OBJECT_STRING = '[object Object]'
 export function isPlainObject(obj) {
