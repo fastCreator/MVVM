@@ -20,7 +20,8 @@ mvvm并没有实现真正的model-view统一，当dom直接被修改时，model�
 API:
 	new MVVM({
 		splitstart:"{{",
-		splitend:"}}"
+		splitend:"}}",
+		Plugs:[fuc1,fuc2],
 		data:{
 			b:'123123',
 			c:Node('<span></span>')  
@@ -44,3 +45,24 @@ API:
 		}
 
 	})
+
+
+vm._plugs 插件
+vm._h
+
+vm._s tostring
+vm._l 为了for循环子元素
+vm.$data
+
+MVVM.dirctive
+
+cloak隐藏
+if 
+for
+	智能绑定echart等插件
+	只需要data项 data:setMVVM(vm,{a:1,b:2})
+	setMVVM=function(data){
+		1,设置data observer
+		2,mutationobserver
+		3,return {a:'{{vm.a}}',b:'{{vm.b}}'};
+	}

@@ -20,14 +20,20 @@
 //warn
 //nextTick
 //_set
+//cached
 //操作对象
 //remove
 //parsePath
 
 
-
-
-
+export function cached(fn) {
+    const cache = Object.create(null)
+    return function cachedFn(str) {
+        const hit = cache[str]
+        return hit || (cache[str] = fn(str))
+    }
+}
+ 
 function copyProperties(target, source) {
     for (let key of Reflect.ownKeys(source)) {
         if (key !== "constructor"

@@ -1,7 +1,7 @@
 import { observe } from './observer/index';
 import Dep from './observer/dep';
 import Watcher from './observer/watcher';
-import { initDom } from './dom/initDom'
+import { initDom } from './parser/initDom'
 import { noop, warn, isPlainObject } from './utils';
 
 const sharedPropertyDefinition = {
