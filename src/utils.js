@@ -13,18 +13,20 @@
 //isNative
 //isPlainObject
 //isNonPhrasingTag
-//hasOwn
-//生成
-//bind
+//isFunction
+//hasOwn 
 //工具
+//bind
 //warn
 //nextTick
 //_set
 //cached
 //操作对象
 //remove
-//parsePath
-
+//parsePath 
+export function isFunction(obj) {
+    return typeof obj === 'function'
+}
 
 export function cached(fn) {
     const cache = Object.create(null)
@@ -33,7 +35,7 @@ export function cached(fn) {
         return hit || (cache[str] = fn(str))
     }
 }
- 
+
 function copyProperties(target, source) {
     for (let key of Reflect.ownKeys(source)) {
         if (key !== "constructor"
@@ -210,8 +212,17 @@ export function isDom(dom) {
     return dom instanceof HTMLElement;
 }
 
-export function bind(src, el) {
-    document.querySelector(el).innerHTML = src;
+export function bind(fn, ctx) {
+    function boundFn(a) {
+        const l = arguments.length
+        return l
+            ? l > 1
+                ? fn.apply(ctx, arguments)
+                : fn.call(ctx, a)
+            : fn.call(ctx)
+    } 
+    boundFn._length = fn.length
+    return boundFn
 }
 
 export function isObject(obj) {
