@@ -24,6 +24,9 @@
 //操作对象
 //remove
 //parsePath 
+
+export const query =document.querySelector;
+
 export function isFunction(obj) {
     return typeof obj === 'function'
 }

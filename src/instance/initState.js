@@ -29,6 +29,7 @@ export function initData(vm, data) {
 //初始化计算属性
 const computedWatcherOptions = { lazy: true }
 export function initComputed(vm, computed) {
+    vm._watchers = [];
     const watchers = vm._computedWatchers = Object.create(null)
     for (const key in computed) {
         const userDef = computed[key]
@@ -43,7 +44,6 @@ export function initComputed(vm, computed) {
 }
 //初始化监听
 export function initWatch(vm, watch) {
-    vm._watchers = [];
     for (const key in watch) {
         const handler = watch[key]
         if (Array.isArray(handler)) {

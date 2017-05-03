@@ -1,5 +1,5 @@
-//import Prototype from '.classes/Prototype'
-//import Util from '.classes/Util'
+import {observe} from './observer'
+import {query} from './utils'
 import { initData, initComputed, initMethods, initWatch } from './instance/initState'
 
 let uid = 0;
@@ -23,6 +23,46 @@ global.MVVM = class {
         }
         callHook(this, 'created');
         this.$mount(options.el);
+    }
+
+    $mount(el) {
+        let options = this.$options
+        this.$el = el = el && query(el)
+
+        if (!options.render) {
+            let template = options.template
+            if (template) {
+                if (typeof template === 'string') {
+                    if (template[0] === '#') {
+                        template = idToTemplate(template)
+                    }
+                } else if (template.nodeType) {
+                    template = template.innerHTML
+                }
+            } else if (el) {
+                template = getOuterHTML(el)
+            }
+            if (template) {
+                const render = compileToFunctions(template, this)
+                options.render = render
+            }
+        }
+
+        callHook(this, 'beforeMount')
+
+        if (!options._isComponent) { 
+            // observer.observe(() => {
+            //     this._update(this._render())
+            // })
+            observe(this.$data, true)
+        }
+
+        if (!this._vnode) {
+            this._isMounted = true
+            callHook(this, 'mounted')
+        }
+
+        return this
     }
 }
 
