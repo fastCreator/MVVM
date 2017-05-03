@@ -1,8 +1,7 @@
 import { observe } from '../observer/index';
 import Dep from '../observer/dep';
 import Watcher from '../observer/watcher';
-import { initDom } from '../parser/initDom'
-import { noop, warn, isPlainObject, isFunction } from '../utils';
+import { noop, warn, isPlainObject, isFunction, bind } from '../utils';
 
 const sharedPropertyDefinition = {
     enumerable: true,
@@ -16,19 +15,21 @@ export function initData(vm, data) {
     if (isFunction(data)) {
         data = data()
     }
+    //监听data get(收集依赖)/set(触发更新)
+    observe(data);
+    vm.$data = data;
     const keys = Object.keys(data)
     let i = keys.length;
     //代理data到vm
     while (i--) {
         proxy(vm, '$data', keys[i])
     }
-    //观察data
-    vm.$data = observe(data, true);
 }
 
 //初始化计算属性
 const computedWatcherOptions = { lazy: true }
 export function initComputed(vm, computed) {
+    //存放计算属性，user watch,render watch
     vm._watchers = [];
     const watchers = vm._computedWatchers = Object.create(null)
     for (const key in computed) {
@@ -36,22 +37,10 @@ export function initComputed(vm, computed) {
         let getter = typeof userDef === 'function' ? userDef : userDef.get
         watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions)
         if (!(key in vm)) {
+            //将计算属性放入vm(get/set)
             defineComputed(vm, key, userDef)
         } else {
             warn(`计算属性 "${key}" 已经被定义了哦`)
-        }
-    }
-}
-//初始化监听
-export function initWatch(vm, watch) {
-    for (const key in watch) {
-        const handler = watch[key]
-        if (Array.isArray(handler)) {
-            for (let i = 0; i < handler.length; i++) {
-                createWatcher(vm, key, handler[i])
-            }
-        } else {
-            createWatcher(vm, key, handler)
         }
     }
 }
@@ -62,7 +51,20 @@ export function initMethods(vm, methods) {
         vm[key] = methods[key] == null ? noop : bind(methods[key], vm)
     }
 }
-
+//初始化监听
+export function initWatch(vm, watch) {
+    for (const key in watch) {
+        const handler = watch[key];
+        if (Array.isArray(handler)) {
+            for (let i = 0; i < handler.length; i++) {
+                createWatcher(vm, key, handler[i])
+            }
+        } else {
+            createWatcher(vm, key, handler)
+        }
+    }
+}
+//创建单个watcher
 function createWatcher(vm, key, handler) {
     let options
     //是个对象时，主要为了写deep属性

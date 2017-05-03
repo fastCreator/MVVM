@@ -40,27 +40,32 @@ export default class Watcher {
             this.getter = expOrFn
         } else {
             this.getter = parsePath(expOrFn)
+            console.log(this.getter)
             if (!this.getter) {
                 this.getter = function () { }
             }
         }
+        //判断当是user watch收集依赖
         this.value = this.lazy
             ? undefined
             : this.get()
     }
 
     //computed获取值的时候调用watcher.get();
-    get() {
+    get() { 
         pushTarget(this)
         let value
         const vm = this.vm
         if (this.user) {
+            console.log('get user')
             try {
                 value = this.getter.call(vm, vm)
+                console.log(value);
             } catch (e) {
                 warn(`getter for watcher "${this.expression}"`)
             }
         } else {
+            console.log('get')
             value = this.getter.call(vm, vm)
         }
         //当deep设置为true的时候，来深度观察依赖对象的变动
@@ -125,6 +130,7 @@ export default class Watcher {
                 isObject(value) ||
                 this.deep
             ) {
+                console.log('run')
                 //设置新值
                 const oldValue = this.value
                 this.value = value

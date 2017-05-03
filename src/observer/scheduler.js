@@ -72,6 +72,7 @@ function callActivatedHooks(queue) {
 
 //添加到异步更新队列
 export function queueWatcher(watcher) {
+    console.log('异步队列')
     const id = watcher.id
     if (has[id] == null) {
         has[id] = true

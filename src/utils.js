@@ -7,6 +7,9 @@
 //转换
 //domTostr
 //strTodom
+//idToTemplate
+//camelize
+//capitalize
 //判断
 //isDom
 //isObject
@@ -15,6 +18,7 @@
 //isNonPhrasingTag
 //isFunction
 //hasOwn 
+//resolveAsset
 //工具
 //bind
 //warn
@@ -25,7 +29,59 @@
 //remove
 //parsePath 
 
-export const query =document.querySelector;
+
+export function toString(val) {
+    return val == null
+        ? ''
+        : typeof val === 'object'
+            ? JSON.stringify(val, null, 2)
+            : String(val)
+}
+const camelizeRE = /-(\w)/g
+export const camelize = cached((str) => {
+    return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
+})
+
+export const capitalize = cached((str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+})
+
+//匹配组件名称的各种规则
+export function resolveAsset(options, type, id) {
+    /* istanbul ignore if */
+    if (typeof id !== 'string') {
+        return
+    }
+    let assets = options[type]
+    if (!assets) {
+        return
+    }
+    if (hasOwn(assets, id)) { return assets[id] }
+    var camelizedId = camelize(id)
+    if (hasOwn(assets, camelizedId)) { return assets[camelizedId] }
+    var PascalCaseId = capitalize(camelizedId)
+    if (hasOwn(assets, PascalCaseId)) { return assets[PascalCaseId] }
+}
+
+export const idToTemplate = cached((id) => {
+    console.log(id)
+    var el = query(id)
+
+
+    return el && el.innerHTML
+})
+
+
+export function query(el) {
+    if (typeof el === 'string') {
+        const selector = el
+        el = document.querySelector(el)
+        if (!el) {
+            return document.createElement('div')
+        }
+    }
+    return el
+}
 
 export function isFunction(obj) {
     return typeof obj === 'function'
@@ -223,7 +279,7 @@ export function bind(fn, ctx) {
                 ? fn.apply(ctx, arguments)
                 : fn.call(ctx, a)
             : fn.call(ctx)
-    } 
+    }
     boundFn._length = fn.length
     return boundFn
 }
