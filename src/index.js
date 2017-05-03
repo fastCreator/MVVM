@@ -4,7 +4,7 @@ import { initData, initComputed, initMethods, initWatch } from './instance/initS
 
 let uid = 0;
 
-export class MVVM {
+global.MVVM = class {
     constructor(options) {
         this.$options = options;
         this._uid = uid++;
@@ -25,7 +25,7 @@ export class MVVM {
         this.$mount(options.el);
     }
 }
- 
+
 
 //继承多个父类
 function mix(...mixins) {

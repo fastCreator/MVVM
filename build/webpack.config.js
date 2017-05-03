@@ -9,13 +9,15 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: 'MVVM.js'
-  }, 
+  },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
-        loaders: ['babel-loader'],
-        exclude: [/node_modules/]
+        loader: 'babel-loader',
+        options: {
+          presets: [['es2015', { modules: false }], 'stage-1']
+        }
       }
     ]
   },
@@ -28,6 +30,6 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
   ],
   devServer: {
-    port: 8090
+    port: 8092
   }
 }
