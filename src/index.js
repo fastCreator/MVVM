@@ -4,9 +4,11 @@ import { query, warn, idToTemplate, toString, resolveAsset } from './utils'
 import { initData, initComputed, initMethods, initWatch } from './instance/initState'
 import { compileToFunctions } from './parser'
 import { patch, h, VNode } from './vnode'
+import Directive from './directives'
+
 let uid = 0;
 
-global.MVVM = class {
+global.MVVM = class extends mix(Directive) {
     constructor(options) {
         this.$options = options;
         this._uid = uid++;
@@ -28,27 +30,32 @@ global.MVVM = class {
     }
 
     $mount(el) {
-        let options = this.$options
+        let options = this.$options;
+        //渲染入口
         this.$el = el = el && query(el);
+        //判断是否用户自定义render h函数,则不需要template
         if (!options.render) {
             //获取template
             let template = options.template
             if (template) {
                 if (typeof template === 'string') {
+                    //获取script的template模板
                     if (template[0] === '#') {
                         template = idToTemplate(template)
                     }
+                    //获取DOM类型tempalte
                 } else if (template.nodeType) {
                     template = template.innerHTML
                 }
+                //直接从入口处获取template
             } else if (el) {
                 template = getOuterHTML(el)
             }
+            console.log(template)
             //生成render函数
             if (template) {
-                console.log(template)
+                //生成render函数
                 const render = compileToFunctions(template, this)
-                console.log(render)
                 options.render = render
             }
         }
@@ -95,11 +102,11 @@ global.MVVM = class {
         let render = this.$options.render
         let vnode
         try {
-            vnode = render.call(this);
+            //自动解析的template不需要h,用户自定义的函数需要h
+            vnode = render.call(this, h);
         } catch (e) {
             warn(`render Error : ${e}`)
         }
-        console.log(vnode)
         return vnode
     }
 
@@ -115,7 +122,7 @@ global.MVVM = class {
             this.$el = this._patch(this.$el, vnode)
         } else {
             this.$el = this._patch(prevVnode, vnode)
-        } 
+        }
         if (this._isMounted) {
             callHook(this, 'updated')
         }
@@ -193,6 +200,18 @@ function mix(...mixins) {
         copyProperties(Mix.prototype, mixin.prototype);
     }
     return Mix;
+}
+
+function copyProperties(target, source) {
+    for (let key of Reflect.ownKeys(source)) {
+        if (key !== "constructor"
+            && key !== "prototype"
+            && key !== "name"
+        ) {
+            let desc = Object.getOwnPropertyDescriptor(source, key);
+            Object.defineProperty(target, key, desc);
+        }
+    }
 }
 
 //生命周期钩子函数
