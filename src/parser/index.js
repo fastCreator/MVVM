@@ -1,5 +1,6 @@
 import HTMLParser from './html-parser'
 import TextParser from './text-parser'
+import { hooks } from '../directives'
 import codeGen from './codegen'
 import { warn, camelize } from '../utils'
 import {
@@ -19,30 +20,43 @@ import {
     processIfConditions
 } from './helpers'
 
+//缓存template解析之后的render函数
 const cache = {}
 
 export function compileToFunctions(template, vm) {
     let root
     let currentParent
     let options = vm.$options
-    let stack = []
-
+    let stack = [];//记录当前节点位置:push,pop(树形)
+    //直接获取render函数
     if (cache[template]) {
         return cache[template]
     }
-
+    //通过John Resig 的 HTML Parser 解析template to vnode(自定义格式的Obejct，用于表示dom)
+    //文档:http://ejohn.org/blog/pure-javascript-html-parser/
+    //type 
+    //1 标签 2 文本表达式 3 纯文本
     HTMLParser(template, {
+        //标签开始部位,unary:true 自闭合标签 exp:<br/>;false 闭合标签 <a></a>
         start: function (tag, attrs, unary) {
             const element = {
                 type: 1,
                 tag,
+                //属性[{name:key,value:value},...]
                 attrsList: attrs,
-                attrsMap: makeAttrsMap(attrs),
+                //属性{key1:value1,key2:value2}
+                attrsMap: makeAttrsMap(attrs),//json格式转换
                 parent: currentParent,
                 children: []
             }
-
+            //解析指令
+            //tofix
+            //后期修改为统一指令问题
             processFor(element)
+            //有问题待修改
+            hooks.template2Vnode.forEach(function (item) {
+                item(element);
+            });
             processIf(element)
             processKey(element)
             processAttrs(element)
@@ -61,27 +75,30 @@ export function compileToFunctions(template, vm) {
                     element.parent = currentParent
                 }
             }
-
+            //不是自闭合标签
             if (!unary) {
                 currentParent = element
                 stack.push(element)
             }
         },
+        //标签结束
         end: function (tag) {
             const element = stack[stack.length - 1]
             const lastNode = element.children[element.children.length - 1]
+            //删除最后一个空白文字节点
             if (lastNode && lastNode.type === 3 && lastNode.text === ' ') {
                 element.children.pop()
             }
-            // pop stack
+            // pop stack,比直接pop节约性能
             stack.length -= 1
             currentParent = stack[stack.length - 1]
         },
+        //中间文本部分
         chars: function (text) {
             if (!text.trim()) {
                 text = ' '
             }
-
+            //解析文本节点 exp: a{{b}}c => 'a'+_s(a)+'b'
             let expression = TextParser(text, options.delimiters)
             if (expression) {
                 currentParent.children.push({
@@ -95,15 +112,20 @@ export function compileToFunctions(template, vm) {
                     text
                 })
             }
-
         }
     })
+    //缓存template
+    //解析vnode为render函数
     return (cache[template] = codeGen(root))
 }
 
 function processFor(el) {
     let exp
+    //获取属性值
     if ((exp = getAndRemoveAttr(el, 'm-for'))) {
+        //获取数组
+        //(key ,index) in arr
+        //[0] (key ,index) in arr,[1] (key ,index),[2] arr  
         const inMatch = exp.match(forAliasRE)
         if (!inMatch) {
             warn(`Invalid v-for expression: ${exp}`)
@@ -111,9 +133,13 @@ function processFor(el) {
         }
         el.for = inMatch[2].trim()
         const alias = inMatch[1].trim()
+        //分解 (value,key ,index)
+        //alias  value
+        //iterator1 key
+        //iterator2 index
         const iteratorMatch = alias.match(forIteratorRE)
         if (iteratorMatch) {
-            el.alias = iteratorMatch[1].trim()
+            el.alias = iteratorMatch[1].trim();
             el.iterator1 = iteratorMatch[2].trim()
             if (iteratorMatch[3]) {
                 el.iterator2 = iteratorMatch[3].trim()
@@ -125,7 +151,8 @@ function processFor(el) {
 }
 
 function processIf(el) {
-    const exp = getAndRemoveAttr(el, 'v-if')
+    //同上m-for
+    const exp = getAndRemoveAttr(el, 'm-if')
     if (exp) {
         el.if = exp
         addIfCondition(el, {
@@ -133,10 +160,10 @@ function processIf(el) {
             block: el
         })
     } else {
-        if (getAndRemoveAttr(el, 'v-else') != null) {
+        if (getAndRemoveAttr(el, 'm-else') != null) {
             el.else = true
         }
-        const elseif = getAndRemoveAttr(el, 'v-else-if')
+        const elseif = getAndRemoveAttr(el, 'm-else-if')
         if (elseif) {
             el.elseif = elseif
         }

@@ -25,9 +25,9 @@ const keyCodes = {
 }
 
 export default function codeGen(ast) {
-
+    //解析成h render字符串形式
     const code = ast ? genElement(ast) : '_h("div")'
-
+    //把render函数，包起来，使其在当前作用域内
     return makeFunction(`with(this){return ${code}}`)
 }
 
@@ -40,8 +40,9 @@ function genElement(el) {
     } else {
         let code
         //设置属性 等值
-        const data = genData(el)
-        const children = genChildren(el, true)
+        const data = genData(el);
+        //转换子节点
+        const children = genChildren(el, true);
         code = `_h('${el.tag}'${
             data ? `,${data}` : '' // data
             }${
@@ -55,9 +56,8 @@ function genChildren(el, checkSkip) {
     const children = el.children
     if (children.length) {
         const el = children[0]
-        // optimize single v-for
-        if (children.length === 1 &&
-            el.for) {
+        // 如果是v-for
+        if (children.length === 1 && el.for) {
             return genElement(el)
         }
         const normalizationType = 0
@@ -91,7 +91,7 @@ function genIfConditions(conditions) {
         return genElement(el)
     }
 }
-
+//解析m-for
 function genFor(el) {
     const exp = el.for
     const alias = el.alias

@@ -14,8 +14,8 @@
     <div>
       <h1 width="123">{{title}}</h1>
       <h1 width="123">{{arr}}</h1>
-      <ul>
-        <!--<li m-for="(val, key, index) in arr">索引 {{i + 1}} ：{{value}}</li>-->
+      <ul> 
+        <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li> 
       </ul>
       <h2>{{title2}}</h2>
       <h2>{{title3}}</h2>
@@ -23,14 +23,13 @@
   </script>
   <script>
     var vm = new MVVM({
-      el: '#to',
-      template: '#app',
-      splitStart: '{',
-      splitEnd: '}',
+      el: '#to', 
+      template: '#app', 
+      delimiters:['{{','}}'], 
       data: {
         title: '标题',
         obj: { a: { b: 2 } },
-        arr: [1, 2, 3, 4, 5]
+        arr: [1, 2, 3, 4, 5], 
       },
       computed: {
         title2: function () {
