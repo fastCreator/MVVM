@@ -4,11 +4,11 @@ import { query, warn, idToTemplate, toString, resolveAsset } from './utils'
 import { initData, initComputed, initMethods, initWatch } from './instance/initState'
 import { compileToFunctions } from './parser'
 import { patch, h, VNode } from './vnode'
-import Directive from './directives'
+import { directive } from './directives'
 
 let uid = 0;
 
-global.MVVM = class{
+global.MVVM = class {
     constructor(options) {
         this.$options = options;
         this._uid = uid++;
@@ -27,6 +27,10 @@ global.MVVM = class{
         }
         callHook(this, 'created');
         this.$mount(options.el);
+    }
+
+    static use(plugin) {
+        plugin && plugin.install && plugin.install.call(this, MVVM);
     }
 
     $mount(el) {
@@ -191,28 +195,29 @@ global.MVVM = class{
 
 }
 
+MVVM.use(directive);
 
 //继承多个父类
-function mix(...mixins) {
-    class Mix { }
-    for (let mixin of mixins) {
-        copyProperties(Mix, mixin);
-        copyProperties(Mix.prototype, mixin.prototype);
-    }
-    return Mix;
-}
+// function mix(...mixins) {
+//     class Mix { }
+//     for (let mixin of mixins) {
+//         copyProperties(Mix, mixin);
+//         copyProperties(Mix.prototype, mixin.prototype);
+//     }
+//     return Mix;
+// }
 
-function copyProperties(target, source) {
-    for (let key of Reflect.ownKeys(source)) {
-        if (key !== "constructor"
-            && key !== "prototype"
-            && key !== "name"
-        ) {
-            let desc = Object.getOwnPropertyDescriptor(source, key);
-            Object.defineProperty(target, key, desc);
-        }
-    }
-}
+// function copyProperties(target, source) {
+//     for (let key of Reflect.ownKeys(source)) {
+//         if (key !== "constructor"
+//             && key !== "prototype"
+//             && key !== "name"
+//         ) {
+//             let desc = Object.getOwnPropertyDescriptor(source, key);
+//             Object.defineProperty(target, key, desc);
+//         }
+//     }
+// }
 
 //生命周期钩子函数
 function callHook(vm, hook) {

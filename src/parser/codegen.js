@@ -1,4 +1,5 @@
 import { makeFunction } from './helpers'
+import { hooks } from '../directives'
 
 const fnExpRE = /^\s*([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/
 const simplePathRE = /^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['.*?']|\[".*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*\s*$/
@@ -32,10 +33,16 @@ export default function codeGen(ast) {
 }
 
 function genElement(el) {
-    //设置值  作用域
-    if (el.for && !el.forProcessed) {
-        return genFor(el)
-    } else if (el.if && !el.ifProcessed) {
+    //设置值  作用域 
+    let drictive = el.drictive
+    for (let i = 0, l = drictive.length; i < l; i++) {
+        if (hooks[drictive[i].name]) {
+            return hooks[drictive[i].name].vnode2render(el, genElement)
+        }
+    }
+
+
+    if (el.if && !el.ifProcessed) {
         return genIf(el)
     } else {
         let code

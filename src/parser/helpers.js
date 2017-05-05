@@ -6,6 +6,7 @@ export const forIteratorRE = /\((\{[^}]*\}|[^,]*),([^,]*)(?:,([^,]*))?\)/
 export const onRE = /^@|^v-on:/
 export const bindRE = /^:|^v-bind:/
 export const modifierRE = /\.[^.]+/g
+export const drictiveRE = /^m\-([^\.]+)\.?([^\:]+)?\:?(.+)?/
 
 //添加判断条件，是否显示
 export function addIfCondition(el, condition) {
@@ -45,6 +46,34 @@ export function makeAttrsMap(attrs) {
         map[attrs[i].name] = attrs[i].value
     }
     return map
+}
+//获取指令
+//[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
+export function getDrictive(attrs) {
+    const directive = []
+    for (let i = 0, l = attrs.length; i < l; i++) {
+        let name = attrs[i].name; 
+        let darr = name.match(drictiveRE); 
+        if (darr) {
+            directive.push({
+                name: darr[1],
+                expression: attrs[i].value,
+                modifiers: split(darr[2]),
+                arg: darr[3]
+            })
+        }
+    }
+    return directive
+    function split(modifiers) {
+        var map = {};
+        var mod = modifiers && modifiers.split('.');
+        if (mod) {
+            mod.split('.').forEach(function (item, i) {
+                map[item] = true;
+            });
+        }
+        return map;
+    }
 }
 
 export function addAttr(el, name, value) {

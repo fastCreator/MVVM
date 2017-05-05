@@ -17,7 +17,8 @@ import {
     addProp,
     addHandler,
     parseModifiers,
-    processIfConditions
+    processIfConditions,
+    getDrictive
 } from './helpers'
 
 //缓存template解析之后的render函数
@@ -47,16 +48,23 @@ export function compileToFunctions(template, vm) {
                 //属性{key1:value1,key2:value2}
                 attrsMap: makeAttrsMap(attrs),//json格式转换
                 parent: currentParent,
+                //v-my-directive.foo.bar:arg ="expression"
+                //属性//[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
+                drictive: getDrictive(attrs),
                 children: []
             }
             //解析指令
             //tofix
             //后期修改为统一指令问题
-            processFor(element)
+            //processFor(element) 
             //有问题待修改
-            hooks.template2Vnode.forEach(function (item) {
-                item(element);
-            });
+            console.log(element.drictive)
+            element.drictive.forEach(function (dir) {
+                console.log(hooks[dir.name])
+                if (hooks[dir.name]) {
+                    hooks[dir.name].template2Vnode(element,dir)
+                }
+            }); 
             processIf(element)
             processKey(element)
             processAttrs(element)
