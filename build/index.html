@@ -9,11 +9,13 @@
   <div id="to">
 
   </div>
+
   <script id="app" type="text/html">
     <div>
       <h1 width="123">{{title}}</h1>
+      <h1 width="123">{{arr}}</h1>
       <ul>
-        <li m-for="(val, key, index) in arr">索引 {{i + 1}} ：{{value}}</li>
+        <!--<li m-for="(val, key, index) in arr">索引 {{i + 1}} ：{{value}}</li>-->
       </ul>
       <h2>{{title2}}</h2>
       <h2>{{title3}}</h2>
@@ -21,8 +23,8 @@
   </script>
   <script>
     var vm = new MVVM({
-      from: 'app',
-      to: '#to',
+      el: '#to',
+      template: '#app',
       splitStart: '{',
       splitEnd: '}',
       data: {
@@ -32,7 +34,7 @@
       },
       computed: {
         title2: function () {
-          console.log(123);
+          console.log('初次title2');
           return this.title + 2;
         },
         title3: {
@@ -44,10 +46,30 @@
           }
         }
       },
-      watch: {
-        title3: function (o, n) {
-          console.log(o, n);
+      // watch: {
+      //   title: function (o, n) {
+      //     console.log(o, n);
+      //   },
+      //   title2: function (o, n) {
+      //     console.log(o, n);
+      //   },
+      //   title3: function (o, n) {
+      //     console.log(o, n);
+      //   }
+      // },
+      methods: {
+        test: function () {
+          console.log('test methods')
         }
+      },
+      beforeCreate: function () {
+        console.log('beforeCreate')
+      },
+      beforeUpdate: function () {
+        console.log('beforeUpdate')
+      },
+      created: function () {
+        console.log('created')
       }
     })  
   </script
