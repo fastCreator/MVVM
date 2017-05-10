@@ -1,12 +1,9 @@
 import { noop, warn } from '../utils'
 
-export const dirRE = /^v-|^@|^:/
-export const forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/
-export const forIteratorRE = /\((\{[^}]*\}|[^,]*),([^,]*)(?:,([^,]*))?\)/
-export const onRE = /^@|^v-on:/
-export const bindRE = /^:|^v-bind:/
+export const dirRE = /^m-|^@|^:/
+export const bindRE = /^:|^m-bind:/
 export const modifierRE = /\.[^.]+/g
-export const drictiveRE = /^m\-([^\.]+)\.?([^\:]+)?\:?(.+)?/
+export const drictiveRE = /^m\-(\w+)(\:[^\.]+)?\.?([^\:]+)?/
 
 //添加判断条件，是否显示
 export function addIfCondition(el, condition) {
@@ -24,6 +21,7 @@ export function parseModifiers(name) {
         return ret
     }
 }
+
 //获取vnode中的中的属性[name],并且删除attrsList中改值
 //删除值为了不再渲染自定义指令属性
 export function getAndRemoveAttr(el, name) {
@@ -39,6 +37,7 @@ export function getAndRemoveAttr(el, name) {
     }
     return val
 }
+
 //{name:key,value:value} to {key:value}
 export function makeAttrsMap(attrs) {
     const map = {}
@@ -47,19 +46,18 @@ export function makeAttrsMap(attrs) {
     }
     return map
 }
-//获取指令
-//[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
+//获取指令 
 export function setElDrictive(el, attrs) {
-    const directive = []
     for (let i = 0, l = attrs.length; i < l; i++) {
         let name = attrs[i].name;
         let darr = name.match(drictiveRE);
         if (darr) {
+            console.log(darr)
             el[darr[1]] = {
                 name: darr[1],
                 expression: attrs[i].value,
-                modifiers: split(darr[2]),
-                arg: darr[3]
+                modifiers: split(darr[3]),
+                arg: darr[2] && darr[2].slice(1)
             }
         }
     }

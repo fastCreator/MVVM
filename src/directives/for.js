@@ -36,8 +36,7 @@ export const directiveFor = {
             const exp = el.for
             const alias = el.alias
             const iterator1 = el.iterator1 ? `,${el.iterator1}` : ''
-            const iterator2 = el.iterator2 ? `,${el.iterator2}` : ''
-            el.forProcessed = true // avoid recursion 
+            const iterator2 = el.iterator2 ? `,${el.iterator2}` : '' 
             return `_l((${exp}),` +
                 `function(${alias}${iterator1}${iterator2}){` +
                 `return ${genElement(el)}` +

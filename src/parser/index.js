@@ -50,39 +50,35 @@ export function compileToFunctions(template, vm) {
                 parent: currentParent,
                 //v-my-directive.foo.bar:arg ="expression"
                 //属性//[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
-                children: []
+                children: [],
+                events: {}
             }
-            setElDrictive(element, attrs);
             //解析指令
+            setElDrictive(element, attrs);
+
             //tofix
             //后期修改为统一指令问题
             //processFor(element) 
             //processIf(element)
             //有问题待修改  
-            
+
             for (var hkey in hooks) {
                 var hook;
                 if (element[hkey] && (hook = hooks[hkey].template2Vnode)) {
-                    hook(element,element[hkey]);
+                    hook(element, element[hkey]);
                 }
             } 
-
-            processKey(element)
-            processAttrs(element)
+            //待实现
+            // processKey(element)
+            // processAttrs(element)
 
             if (!root) {
                 root = element
             }
 
             if (currentParent && !element.forbidden) {
-                if (element.elseif || element.else) {
-                    processIfConditions(element, currentParent)
-                } else if (element.slotScope) { // scoped slot
-
-                } else {
-                    currentParent.children.push(element)
-                    element.parent = currentParent
-                }
+                currentParent.children.push(element)
+                element.parent = currentParent
             }
             //不是自闭合标签
             if (!unary) {

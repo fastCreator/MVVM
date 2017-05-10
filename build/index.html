@@ -13,7 +13,7 @@
   <script id="app" type="text/html">
     <div>
       <h1 m-if="arr[0]" width="123">显示{{title}}</h1>
-      <h1 width="123">{{arr}}</h1>
+      <h1 width="123" m-on:click="test">{{arr}}</h1>
       <ul>
         <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
       </ul>
@@ -59,7 +59,7 @@
       },
       methods: {
         test: function () {
-          console.log('test methods') 
+          console.log('test methods')
         }
       },
       beforeCreate: function () {

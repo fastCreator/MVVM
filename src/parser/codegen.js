@@ -129,22 +129,23 @@ function genText(text) {
 
 function genData(el) {
     let data = '{'
-
+    console.log(el)
     // attributes
-    if (el.attrs) {
-        data += `attrs:{${genProps(el.attrs)}},`
-    }
-    // DOM props
-    if (el.props) {
-        data += `props:{${genProps(el.props)}},`
-    }
+    // if (el.attrs) {
+    //     data += `attrs:{${genProps(el.attrs)}},`
+    // }
+    // // DOM props
+    // if (el.props) {
+    //     data += `props:{${genProps(el.props)}},`
+    // }
     // event handlers
-    if (el.events) {
-        data += `${genHandlers(el.events)},`
-    }
-    if (el.nativeEvents) {
-        data += `${genHandlers(el.nativeEvents, true)},`
-    }
+    //tofix
+    // if (el.events) {
+    //     data += `${genHandlers(el.events)},`
+    // }
+    // if (el.nativeEvents) {
+    //     data += `${genHandlers(el.nativeEvents, true)},`
+    // }
 
     data = data.replace(/,$/, '') + '}'
 

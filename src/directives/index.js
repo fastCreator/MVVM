@@ -1,6 +1,7 @@
 import { isFunction } from '../utils'
 import { directiveFor } from './for'
 import { directiveIf } from './if'
+import { directiveOn } from './on'
 
 export const hooks = {
 
@@ -14,5 +15,6 @@ export const directive = {
         } 
         MVVM.directive('for', directiveFor);
         MVVM.directive('if', directiveIf);
+        MVVM.directive('on', directiveOn);
     }
 } 
