@@ -54,7 +54,7 @@ export function defineReactive(obj, key, val, customSetter) {
             if (Dep.target) {
                 //把自己添加到依赖
                 dep.depend()
-                if (childOb) { 
+                if (childOb) {
                     //访问子的时候会冒泡去访问父
                     //父会把子添加到__ob__，这个属性只是看看而已，没什么实际意义
                     //会添加data属性下的所有对象离散集
@@ -84,7 +84,7 @@ export function defineReactive(obj, key, val, customSetter) {
         }
     })
 }
-
+//导出观察方法
 export function observe(value, asRootData) {
     if (!isObject(value)) {
         return
@@ -110,5 +110,15 @@ function copyAugment(target, src, keys) {
     for (let i = 0, l = keys.length; i < l; i++) {
         const key = keys[i]
         def(target, key, src[key])
+    }
+}
+//为数组添加依赖
+function dependArray(value) {
+    for (let e, i = 0, l = value.length; i < l; i++) {
+        e = value[i]
+        e && e.__ob__ && e.__ob__.dep.depend()
+        if (Array.isArray(e)) {
+            dependArray(e)
+        }
     }
 }

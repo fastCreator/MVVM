@@ -12,10 +12,10 @@
 
   <script id="app" type="text/html">
     <div>
-      <h1 width="123">{{title}}</h1>
+      <h1 m-if="arr[0]" width="123">显示{{title}}</h1>
       <h1 width="123">{{arr}}</h1>
-      <ul> 
-        <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li> 
+      <ul>
+        <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
       </ul>
       <h2>{{title2}}</h2>
       <h2>{{title3}}</h2>
@@ -23,13 +23,14 @@
   </script>
   <script>
     var vm = new MVVM({
-      el: '#to', 
-      template: '#app', 
-      delimiters:['{{','}}'], 
+      el: '#to',
+      template: '#app',
+      delimiters: ['{{', '}}'],
       data: {
+        a: false,
         title: '标题',
         obj: { a: { b: 2 } },
-        arr: [1, 2, 3, 4, 5], 
+        arr: [1, 0, 3, 4, 5],
       },
       computed: {
         title2: function () {
@@ -45,20 +46,20 @@
           }
         }
       },
-      // watch: {
-      //   title: function (o, n) {
-      //     console.log(o, n);
-      //   },
-      //   title2: function (o, n) {
-      //     console.log(o, n);
-      //   },
-      //   title3: function (o, n) {
-      //     console.log(o, n);
-      //   }
-      // },
+      watch: {
+        title: function (o, n) {
+          console.log(o, n);
+        },
+        title2: function (o, n) {
+          console.log(o, n);
+        },
+        title3: function (o, n) {
+          console.log(o, n);
+        }
+      },
       methods: {
         test: function () {
-          console.log('test methods')
+          console.log('test methods') 
         }
       },
       beforeCreate: function () {

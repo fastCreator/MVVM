@@ -33,30 +33,33 @@ export default function codeGen(ast) {
 }
 
 function genElement(el) {
-    //设置值  作用域 
-    let drictive = el.drictive
-    for (let i = 0, l = drictive.length; i < l; i++) {
-        if (hooks[drictive[i].name]) {
-            return hooks[drictive[i].name].vnode2render(el, genElement)
+    //指令阶段
+    if (!el.processed) {
+        el.processed = true;
+        for (var hkey in hooks) {
+            var hook;
+            if (el[hkey] && (hook = hooks[hkey].vnode2render)) {
+                return hook(el, genElement);
+            }
         }
     }
+    //无指令
+    return nodir(el)
+}
 
-
-    if (el.if && !el.ifProcessed) {
-        return genIf(el)
-    } else {
-        let code
-        //设置属性 等值
-        const data = genData(el);
-        //转换子节点
-        const children = genChildren(el, true);
-        code = `_h('${el.tag}'${
-            data ? `,${data}` : '' // data
-            }${
-            children ? `,${children}` : '' // children
-            })`
-        return code
-    }
+//没有指令时运行,或者指令解析完毕 
+function nodir(el) {
+    let code
+    //设置属性 等值
+    const data = genData(el);
+    //转换子节点
+    const children = genChildren(el, true);
+    code = `_h('${el.tag}'${
+        data ? `,${data}` : '' // data
+        }${
+        children ? `,${children}` : '' // children
+        })`
+    return code
 }
 
 function genChildren(el, checkSkip) {

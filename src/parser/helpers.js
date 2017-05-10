@@ -49,21 +49,20 @@ export function makeAttrsMap(attrs) {
 }
 //获取指令
 //[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
-export function getDrictive(attrs) {
+export function setElDrictive(el, attrs) {
     const directive = []
     for (let i = 0, l = attrs.length; i < l; i++) {
-        let name = attrs[i].name; 
-        let darr = name.match(drictiveRE); 
+        let name = attrs[i].name;
+        let darr = name.match(drictiveRE);
         if (darr) {
-            directive.push({
+            el[darr[1]] = {
                 name: darr[1],
                 expression: attrs[i].value,
                 modifiers: split(darr[2]),
                 arg: darr[3]
-            })
+            }
         }
     }
-    return directive
     function split(modifiers) {
         var map = {};
         var mod = modifiers && modifiers.split('.');

@@ -29,6 +29,7 @@ module.exports = {
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],
+  devtool: 'source-map',
   devServer: {
     port: 8092
   }

@@ -18,7 +18,7 @@ import {
     addHandler,
     parseModifiers,
     processIfConditions,
-    getDrictive
+    setElDrictive
 } from './helpers'
 
 //缓存template解析之后的render函数
@@ -50,22 +50,23 @@ export function compileToFunctions(template, vm) {
                 parent: currentParent,
                 //v-my-directive.foo.bar:arg ="expression"
                 //属性//[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
-                drictive: getDrictive(attrs),
                 children: []
             }
+            setElDrictive(element, attrs);
             //解析指令
             //tofix
             //后期修改为统一指令问题
             //processFor(element) 
-            //有问题待修改
-            console.log(element.drictive)
-            element.drictive.forEach(function (dir) {
-                console.log(hooks[dir.name])
-                if (hooks[dir.name]) {
-                    hooks[dir.name].template2Vnode(element,dir)
+            //processIf(element)
+            //有问题待修改  
+            
+            for (var hkey in hooks) {
+                var hook;
+                if (element[hkey] && (hook = hooks[hkey].template2Vnode)) {
+                    hook(element,element[hkey]);
                 }
-            }); 
-            processIf(element)
+            } 
+
             processKey(element)
             processAttrs(element)
 
@@ -158,25 +159,7 @@ function processFor(el) {
     }
 }
 
-function processIf(el) {
-    //同上m-for
-    const exp = getAndRemoveAttr(el, 'm-if')
-    if (exp) {
-        el.if = exp
-        addIfCondition(el, {
-            exp: exp,
-            block: el
-        })
-    } else {
-        if (getAndRemoveAttr(el, 'm-else') != null) {
-            el.else = true
-        }
-        const elseif = getAndRemoveAttr(el, 'm-else-if')
-        if (elseif) {
-            el.elseif = elseif
-        }
-    }
-}
+
 
 function processKey(el) {
     // TODO key 优化处理

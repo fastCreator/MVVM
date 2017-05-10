@@ -94,3 +94,21 @@ binding: 一个对象，包含以下属性：
 	template2Vnode(currentparent)
 
 	vnode2render(el,s,h,l,vm?) return string
+
+
+pre	补丁程序开始	没有
+init	已添加一个vnode	vnode
+	bind create 已经基于vnode创建了一个DOM元素	 emptyVnode, vnode
+	inserted insert 一个元素已插入到DOM中 vnode
+
+
+pre	补丁程序开始	没有
+init	已添加一个vnode	vnode
+create	已经基于vnode创建了一个DOM元素	emptyVnode, vnode
+insert	一个元素已插入到DOM中	vnode
+prepatch	一个元素即将被修补	oldVnode, vnode
+update	一个元素正在更新	oldVnode, vnode
+postpatch	一个元素已被修补	oldVnode, vnode
+destroy	直接或间接地删除元素	vnode
+remove	一个元素直接从DOM中删除	vnode, removeCallback
+post	补丁过程完成	没有

@@ -2,9 +2,9 @@ export const forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/
 export const forIteratorRE = /\((\{[^}]*\}|[^,]*),([^,]*)(?:,([^,]*))?\)/
 
 export const directiveFor = {
-    template2Vnode: function (el, directive) {
-        let exp = directive.expression
+    template2Vnode: function (el,dir) {
         //获取属性值
+        let exp = dir.expression 
 
         //获取数组
         //(key ,index) in arr
@@ -31,18 +31,17 @@ export const directiveFor = {
             el.alias = alias
         }
     },
-    vnode2render: function (el,genElement) { 
+    vnode2render: function (el, genElement) {
         if (!el.forProcessed) {
             const exp = el.for
             const alias = el.alias
             const iterator1 = el.iterator1 ? `,${el.iterator1}` : ''
             const iterator2 = el.iterator2 ? `,${el.iterator2}` : ''
-            el.forProcessed = true // avoid recursion
-
+            el.forProcessed = true // avoid recursion 
             return `_l((${exp}),` +
                 `function(${alias}${iterator1}${iterator2}){` +
                 `return ${genElement(el)}` +
                 '})'
-        } 
+        }
     }
 }

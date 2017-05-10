@@ -25,8 +25,9 @@ global.MVVM = class {
         if (options.methods) {
             initMethods(this, options.methods)
         }
-        callHook(this, 'created');
         this.$mount(options.el);
+        callHook(this, 'created');
+
     }
 
     static use(plugin) {
@@ -59,8 +60,9 @@ global.MVVM = class {
             //生成render函数
             if (template) {
                 //生成render函数
-                const render = compileToFunctions(template, this)
-                options.render = render
+                const render = compileToFunctions(template, this);
+                console.log(render);
+                options.render = render;
             }
         }
 
@@ -68,7 +70,14 @@ global.MVVM = class {
 
         if (!options._isComponent) {
             //更新dom 
-            this._update(this._render())
+
+            // this._update(this._render())
+            var vm = this;
+            this._watcher = new Watcher(this,
+                function () { vm._update(vm._render(), h); },
+                function updateComponent() {
+                    vm._update(vm._render(), hydrating);
+                });
         }
 
         if (!this._vnode) {
@@ -93,11 +102,58 @@ global.MVVM = class {
     }
 
     $forceUpdate() {
-        this._update(this._render())
+        this._watcher.update();
     }
 
-    $set() { }
-    $delete() { }
+    static $set(target, key, val) {
+        if (Array.isArray(target) && typeof key === 'number') {
+            target.length = Math.max(target.length, key)
+            target.splice(key, 1, val)
+            return val
+        }
+        if (hasOwn(target, key)) {
+            target[key] = val
+            return val
+        }
+        const ob = target.__ob__
+        if (target._isVue || (ob && ob.vmCount)) {
+            process.env.NODE_ENV !== 'production' && warn(
+                'Avoid adding reactive properties to a Vue instance or its root $data ' +
+                'at runtime - declare it upfront in the data option.'
+            )
+            return val
+        }
+        if (!ob) {
+            target[key] = val
+            return val
+        }
+        defineReactive(ob.value, key, val)
+        ob.dep.notify()
+        return val
+    }
+
+    static $delete(target, key) {
+        if (Array.isArray(target) && typeof key === 'number') {
+            target.splice(key, 1)
+            return
+        }
+        const ob = target.__ob__
+        if (target._isVue || (ob && ob.vmCount)) {
+            process.env.NODE_ENV !== 'production' && warn(
+                'Avoid deleting properties on a Vue instance or its root $data ' +
+                '- just set it to null.'
+            )
+            return
+        }
+        if (!hasOwn(target, key)) {
+            return
+        }
+        delete target[key]
+        if (!ob) {
+            return
+        }
+        ob.dep.notify()
+    }
 
     _patch = patch
     _s = toString
@@ -130,6 +186,7 @@ global.MVVM = class {
         if (this._isMounted) {
             callHook(this, 'updated')
         }
+        console.log('vnode', this.$e);
     }
     //渲染template和component
     _h(sel, data, children) {
