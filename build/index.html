@@ -12,8 +12,13 @@
 
   <script id="app" type="text/html">
     <div>
-      <h1 m-if="arr[0]" width="123">显示{{title}}</h1>
-      <h1 width="123" m-on:click="test">{{arr}}</h1>
+      <h1 m-if="arr[0]">显示{{title}}</h1>
+      <h1 m-on:click="test">点击事件</h1>
+      <h1 style="background:#ccc;">style</h1>
+      <input value="attr" disabled data-a='123'>
+      <img src="asd.jpg">
+      <div onClick="alert(1);">alert</div>
+      <c></c>
       <ul>
         <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
       </ul>

@@ -129,11 +129,26 @@ function genText(text) {
 
 function genData(el) {
     let data = '{'
-    console.log(el)
     // attributes
-    // if (el.attrs) {
-    //     data += `attrs:{${genProps(el.attrs)}},`
-    // }
+    if (el.style) {
+        data += 'style:' + genProps(el.style) + ','
+    }
+    if (Object.keys(el.attrs).length) {
+        console.log(el.attrs)
+        data += 'attrs:' + genProps(el.attrs) + ','
+    }
+    if (Object.keys(el.props).length) {
+        data += 'props:' + genProps(el.props) + ','
+    }
+    if (Object.keys(el.events).length) {
+        console.log(el.events);
+        data += 'on:' + genProps(el.events) + ','
+    }
+    // if (el.attrsMap) {
+    //     // data += JSON.stringify({style:{background:'#ccc'}, on: { click:  'this.test'}});
+    //     data += '{on:{click:function(){alert(1)}}}'
+    //     // data += `attrs:{${genProps(el.attrsMap)}},`
+    // } 
     // // DOM props
     // if (el.props) {
     //     data += `props:{${genProps(el.props)}},`
@@ -148,17 +163,19 @@ function genData(el) {
     // }
 
     data = data.replace(/,$/, '') + '}'
-
     return data
 }
 
 function genProps(props) {
-    let res = ''
-    for (let i = 0; i < props.length; i++) {
-        const prop = props[i]
-        res += `"${prop.name}":${prop.value},`
+    let res = '{'
+    // for (let i = 0; i < props.length; i++) {
+    //     const prop = props[i]
+    //     res += `"${prop.name}":${prop.value},`
+    // } 
+    for (let key in props) {
+        res += `"${key}":${props[key]},`
     }
-    return res.slice(0, -1)
+    return res.slice(0, -1) + '}'
 }
 
 function genHandlers(events, native) {

@@ -28,8 +28,7 @@ export default class Dep {
     }
     //设置值的时候，触发异步更新队列
     notify() {
-        const subs = this.subs.slice()
-        console.log(subs);
+        const subs = this.subs.slice();
         for (let i = 0, l = subs.length; i < l; i++) {
             subs[i].update()
         }

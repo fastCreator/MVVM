@@ -55,8 +55,7 @@ global.MVVM = class {
                 //直接从入口处获取template
             } else if (el) {
                 template = getOuterHTML(el)
-            }
-            console.log(template)
+            } 
             //生成render函数
             if (template) {
                 //生成render函数

@@ -17,6 +17,10 @@
 //isPlainObject
 //isNonPhrasingTag
 //isFunction
+//isHTMLTag
+//isSVG
+//isAttr
+//isBooleanAttr
 //hasOwn 
 //resolveAsset
 //工具
@@ -29,6 +33,71 @@
 //remove
 //parsePath 
 
+//判断是不是可移除属性
+export const isAttr = makeMap(
+    'accept,accept-charset,accesskey,action,align,alt,async,autocomplete,' +
+    'autofocus,autoplay,autosave,bgcolor,border,buffered,challenge,charset,' +
+    'checked,cite,class,code,codebase,color,cols,colspan,content,http-equiv,' +
+    'name,contenteditable,contextmenu,controls,coords,data,datetime,default,' +
+    'defer,dir,dirname,disabled,download,draggable,dropzone,enctype,method,for,' +
+    'form,formaction,headers,height,hidden,high,href,hreflang,http-equiv,' +
+    'icon,id,ismap,itemprop,keytype,kind,label,lang,language,list,loop,low,' +
+    'manifest,max,maxlength,media,method,GET,POST,min,multiple,email,file,' +
+    'muted,name,novalidate,open,optimum,pattern,ping,placeholder,poster,' +
+    'preload,radiogroup,readonly,rel,required,reversed,rows,rowspan,sandbox,' +
+    'scope,scoped,seamless,selected,shape,size,type,text,password,sizes,span,' +
+    'spellcheck,src,srcdoc,srclang,srcset,start,step,style,summary,tabindex,' +
+    'target,title,type,usemap,value,width,wrap'
+)
+
+export const isBooleanAttr = makeMap(
+    'allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,' +
+    'default,defaultchecked,defaultmuted,defaultselected,defer,disabled,' +
+    'enabled,formnovalidate,hidden,indeterminate,inert,ismap,itemscope,loop,multiple,' +
+    'muted,nohref,noresize,noshade,novalidate,nowrap,open,pauseonexit,readonly,' +
+    'required,reversed,scoped,seamless,selected,sortable,translate,' +
+    'truespeed,typemustmatch,visible'
+)
+
+//标签
+export const isNonPhrasingTag = makeMap(
+    'address,article,aside,base,blockquote,body,caption,col,colgroup,dd,' +
+    'details,dialog,div,dl,dt,fieldset,figcaption,figure,footer,form,' +
+    'h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,legend,li,menuitem,meta,' +
+    'optgroup,option,param,rp,rt,source,style,summary,tbody,td,tfoot,th,thead,' +
+    'title,tr,track'
+)
+//创建一个映射并返回一个函数，以检查键是否在该映射中。
+export function makeMap(str, expectsLowerCase) {
+    const map = Object.create(null)
+    const list = str.split(',')
+    for (let i = 0; i < list.length; i++) {
+        map[list[i]] = true
+    }
+    return expectsLowerCase
+        ? val => map[val.toLowerCase()]
+        : val => map[val]
+}
+export const isHTMLTag = makeMap(
+    'html,body,base,head,link,meta,style,title,' +
+    'address,article,aside,footer,header,h1,h2,h3,h4,h5,h6,hgroup,nav,section,' +
+    'div,dd,dl,dt,figcaption,figure,hr,img,li,main,ol,p,pre,ul,' +
+    'a,b,abbr,bdi,bdo,br,cite,code,data,dfn,em,i,kbd,mark,q,rp,rt,rtc,ruby,' +
+    's,samp,small,span,strong,sub,sup,time,u,var,wbr,area,audio,map,track,video,' +
+    'embed,object,param,source,canvas,script,noscript,del,ins,' +
+    'caption,col,colgroup,table,thead,tbody,td,th,tr,' +
+    'button,datalist,fieldset,form,input,label,legend,meter,optgroup,option,' +
+    'output,progress,select,textarea,' +
+    'details,dialog,menu,menuitem,summary,' +
+    'content,element,shadow,template'
+)
+
+export const isSVG = makeMap(
+    'svg,animate,circle,clippath,cursor,defs,desc,ellipse,filter,font-face,' +
+    'foreignObject,g,glyph,image,line,marker,mask,missing-glyph,path,pattern,' +
+    'polygon,polyline,rect,switch,symbol,text,textpath,tspan,use,view',
+    true
+)
 
 export function toString(val) {
     return val == null
@@ -64,7 +133,6 @@ export function resolveAsset(options, type, id) {
 }
 
 export const idToTemplate = cached((id) => {
-    console.log(id)
     var el = query(id)
 
 
@@ -106,25 +174,7 @@ function copyProperties(target, source) {
         }
     }
 }
-//标签
-export const isNonPhrasingTag = makeMap(
-    'address,article,aside,base,blockquote,body,caption,col,colgroup,dd,' +
-    'details,dialog,div,dl,dt,fieldset,figcaption,figure,footer,form,' +
-    'h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,legend,li,menuitem,meta,' +
-    'optgroup,option,param,rp,rt,source,style,summary,tbody,td,tfoot,th,thead,' +
-    'title,tr,track'
-)
-//创建一个映射并返回一个函数，以检查键是否在该映射中。
-export function makeMap(str, expectsLowerCase) {
-    const map = Object.create(null)
-    const list = str.split(',')
-    for (let i = 0; i < list.length; i++) {
-        map[list[i]] = true
-    }
-    return expectsLowerCase
-        ? val => map[val.toLowerCase()]
-        : val => map[val]
-}
+
 
 export const no = () => false
 

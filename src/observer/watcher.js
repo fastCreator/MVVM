@@ -39,8 +39,7 @@ export default class Watcher {
         if (typeof expOrFn === 'function') {
             this.getter = expOrFn
         } else {
-            this.getter = parsePath(expOrFn)
-            console.log(this.getter)
+            this.getter = parsePath(expOrFn) 
             if (!this.getter) {
                 this.getter = function () { }
             }
@@ -56,16 +55,13 @@ export default class Watcher {
         pushTarget(this)
         let value
         const vm = this.vm
-        if (this.user) {
-            console.log('get user')
+        if (this.user) { 
             try {
-                value = this.getter.call(vm, vm)
-                console.log(value);
+                value = this.getter.call(vm, vm) 
             } catch (e) {
                 warn(`getter for watcher "${this.expression}"`)
             }
-        } else {
-            console.log('get')
+        } else { 
             value = this.getter.call(vm, vm)
         }
         //当deep设置为true的时候，来深度观察依赖对象的变动
@@ -129,8 +125,7 @@ export default class Watcher {
                 //是对象或者是深度的时候需要重新赋值，因为可能突变
                 isObject(value) ||
                 this.deep
-            ) {
-                console.log('run')
+            ) { 
                 //设置新值
                 const oldValue = this.value
                 this.value = value

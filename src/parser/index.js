@@ -2,23 +2,21 @@ import HTMLParser from './html-parser'
 import TextParser from './text-parser'
 import { hooks } from '../directives'
 import codeGen from './codegen'
-import { warn, camelize } from '../utils'
+import { warn, camelize, isHTMLTag, isSVG } from '../utils'
 import {
     dirRE,
     forAliasRE,
-    forIteratorRE,
-    onRE,
+    forIteratorRE, 
     bindRE,
     modifierRE,
     addIfCondition,
     getAndRemoveAttr,
-    makeAttrsMap,
-    addAttr,
-    addProp,
-    addHandler,
+    makeAttrsMap,   
     parseModifiers,
     processIfConditions,
-    setElDrictive
+    setElDrictive,
+    setElStyle,
+    setElAttrs
 } from './helpers'
 
 //缓存template解析之后的render函数
@@ -51,11 +49,17 @@ export function compileToFunctions(template, vm) {
                 //v-my-directive.foo.bar:arg ="expression"
                 //属性//[{name:'my-directive',expression:'expression',modifiers:{foo:true,bar:true},arg:'arg'}]
                 children: [],
-                events: {}
+                events: {},
+                isComponent: !isHTMLTag(tag) && !isSVG(tag),
+                nativeEvents: {},
+                style: null,
+                props: {},//DOM属性
+                attrs: {}//值为true,false则移除该属性
             }
             //解析指令
             setElDrictive(element, attrs);
-
+            // setElProps(element)
+            // setElAttrs(element)
             //tofix
             //后期修改为统一指令问题
             //processFor(element) 
@@ -67,13 +71,16 @@ export function compileToFunctions(template, vm) {
                 if (element[hkey] && (hook = hooks[hkey].template2Vnode)) {
                     hook(element, element[hkey]);
                 }
-            } 
+            }
+            //设置样式
+            setElStyle(element);
+            setElAttrs(element);
             //待实现
             // processKey(element)
             // processAttrs(element)
 
             if (!root) {
-                root = element
+                vm.$vnode = root = element
             }
 
             if (currentParent && !element.forbidden) {
@@ -101,7 +108,8 @@ export function compileToFunctions(template, vm) {
         //中间文本部分
         chars: function (text) {
             if (!text.trim()) {
-                text = ' '
+                //text = ' '
+                return;
             }
             //解析文本节点 exp: a{{b}}c => 'a'+_s(a)+'b'
             let expression = TextParser(text, options.delimiters)
@@ -123,39 +131,6 @@ export function compileToFunctions(template, vm) {
     //解析vnode为render函数
     return (cache[template] = codeGen(root))
 }
-
-function processFor(el) {
-    let exp
-    //获取属性值
-    if ((exp = getAndRemoveAttr(el, 'm-for'))) {
-        //获取数组
-        //(key ,index) in arr
-        //[0] (key ,index) in arr,[1] (key ,index),[2] arr  
-        const inMatch = exp.match(forAliasRE)
-        if (!inMatch) {
-            warn(`Invalid v-for expression: ${exp}`)
-            return
-        }
-        el.for = inMatch[2].trim()
-        const alias = inMatch[1].trim()
-        //分解 (value,key ,index)
-        //alias  value
-        //iterator1 key
-        //iterator2 index
-        const iteratorMatch = alias.match(forIteratorRE)
-        if (iteratorMatch) {
-            el.alias = iteratorMatch[1].trim();
-            el.iterator1 = iteratorMatch[2].trim()
-            if (iteratorMatch[3]) {
-                el.iterator2 = iteratorMatch[3].trim()
-            }
-        } else {
-            el.alias = alias
-        }
-    }
-}
-
-
 
 function processKey(el) {
     // TODO key 优化处理

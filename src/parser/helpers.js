@@ -1,4 +1,4 @@
-import { noop, warn } from '../utils'
+import { noop, warn, isBooleanAttr, isAttr } from '../utils'
 
 export const dirRE = /^m-|^@|^:/
 export const bindRE = /^:|^m-bind:/
@@ -24,18 +24,8 @@ export function parseModifiers(name) {
 
 //获取vnode中的中的属性[name],并且删除attrsList中改值
 //删除值为了不再渲染自定义指令属性
-export function getAndRemoveAttr(el, name) {
-    let val
-    if ((val = el.attrsMap[name]) != null) {
-        const list = el.attrsList
-        for (let i = 0, l = list.length; i < l; i++) {
-            if (list[i].name === name) {
-                list.splice(i, 1)
-                break
-            }
-        }
-    }
-    return val
+export function removeAttr(el, name) {
+    delete el.attrsMap[name];
 }
 
 //{name:key,value:value} to {key:value}
@@ -52,7 +42,7 @@ export function setElDrictive(el, attrs) {
         let name = attrs[i].name;
         let darr = name.match(drictiveRE);
         if (darr) {
-            console.log(darr)
+            //removeAttr(el, name)
             el[darr[1]] = {
                 name: darr[1],
                 expression: attrs[i].value,
@@ -73,13 +63,33 @@ export function setElDrictive(el, attrs) {
     }
 }
 
-export function addAttr(el, name, value) {
-    (el.attrs || (el.attrs = [])).push({ name, value })
+//导出style
+export function setElStyle(el) {
+    var style = el.attrsMap.style;
+    if (style) {
+        removeAttr(el, 'style');
+        el.style = {};
+        style.split(';').forEach(function (item) {
+            if (item) {
+                let spi = item.split(':');
+                el.style[spi[0]] = '"' + spi[1] + '"';
+            }
+        });
+    }
 }
-
-export function addProp(el, name, value) {
-    (el.props || (el.props = [])).push({ name, value })
+//导出属性
+export function setElAttrs(el) {
+    var attrs = el.attrsMap;
+    for (let key in attrs) {
+        let value = attrs[key];
+        if (isAttr(key)) {
+            el.props[key] = "'" + value + "'";
+        } else {
+            el.attrs[key] = "'" + value + "'";
+        }
+    }
 }
+ 
 
 export function addHandler(el, name, value, modifiers, important) {
     // check capture modifier
