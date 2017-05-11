@@ -6,12 +6,12 @@ import { warn, camelize, isHTMLTag, isSVG } from '../utils'
 import {
     dirRE,
     forAliasRE,
-    forIteratorRE, 
+    forIteratorRE,
     bindRE,
     modifierRE,
     addIfCondition,
     getAndRemoveAttr,
-    makeAttrsMap,   
+    makeAttrsMap,
     parseModifiers,
     processIfConditions,
     setElDrictive,
@@ -69,12 +69,12 @@ export function compileToFunctions(template, vm) {
             for (var hkey in hooks) {
                 var hook;
                 if (element[hkey] && (hook = hooks[hkey].template2Vnode)) {
-                    hook(element, element[hkey]);
+                    hook(element, element[hkey], vm);
                 }
             }
             //设置样式
             setElStyle(element);
-            setElAttrs(element);
+            setElAttrs(element,vm.$options.delimiters);
             //待实现
             // processKey(element)
             // processAttrs(element)

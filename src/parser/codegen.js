@@ -133,8 +133,7 @@ function genData(el) {
     if (el.style) {
         data += 'style:' + genProps(el.style) + ','
     }
-    if (Object.keys(el.attrs).length) {
-        console.log(el.attrs)
+    if (Object.keys(el.attrs).length) { 
         data += 'attrs:' + genProps(el.attrs) + ','
     }
     if (Object.keys(el.props).length) {
@@ -172,7 +171,7 @@ function genProps(props) {
     //     const prop = props[i]
     //     res += `"${prop.name}":${prop.value},`
     // } 
-    for (let key in props) {
+    for (let key in props) {  
         res += `"${key}":${props[key]},`
     }
     return res.slice(0, -1) + '}'

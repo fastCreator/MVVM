@@ -29,7 +29,7 @@ export function removeAttr(el, name) {
 }
 
 //{name:key,value:value} to {key:value}
-export function makeAttrsMap(attrs) {
+export function makeAttrsMap(attrs, delimiters) {
     const map = {}
     for (let i = 0, l = attrs.length; i < l; i++) {
         map[attrs[i].name] = attrs[i].value
@@ -78,18 +78,31 @@ export function setElStyle(el) {
     }
 }
 //导出属性
-export function setElAttrs(el) {
+export function setElAttrs(el, delimiters) {
+    var s = delimiters[0], e = delimiters[1];
+    var reg = new RegExp(`^${s}(\.+\)${e}$`); 
     var attrs = el.attrsMap;
     for (let key in attrs) {
         let value = attrs[key];
-        if (isAttr(key)) {
-            el.props[key] = "'" + value + "'";
+        var match = value.match(reg)
+        if (match) {
+            value = match[1];
+            if (isAttr(key)) {
+                el.props[key] = '_s('+value+')';
+            } else {
+                el.attrs[key] = value;
+            }
         } else {
-            el.attrs[key] = "'" + value + "'";
+            if (isAttr(key)) {
+                el.props[key] = "'" + value + "'";
+            } else {
+                el.attrs[key] = "'" + value + "'";
+            }
         }
+
     }
 }
- 
+
 
 export function addHandler(el, name, value, modifiers, important) {
     // check capture modifier

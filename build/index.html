@@ -16,8 +16,12 @@
       <h1 m-on:click="test">点击事件</h1>
       <h1 style="background:#ccc;">style</h1>
       <input value="attr" disabled data-a='123'>
+      <br/>
+      <input id="a" value="model" m-model="a">
+      <input value="{{obj}}">
+      <input m-model="arr[0]">
       <img src="asd.jpg">
-      <div onClick="alert(1);">alert</div>
+      <div onClick="alert(a);">alert</div>
       <c></c>
       <ul>
         <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
@@ -64,7 +68,7 @@
       },
       methods: {
         test: function () {
-          console.log('test methods')
+          console.log(this.a);
         }
       },
       beforeCreate: function () {
