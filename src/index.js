@@ -4,12 +4,12 @@ import { query, warn, idToTemplate, toString, resolveAsset, hasOwn } from './uti
 import { initData, initComputed, initMethods, initWatch } from './instance/initState'
 import { compileToFunctions } from './parser'
 import { patch, h, VNode } from './vnode'
-import { directive } from './directives'
+import { directive } from './plugin/directives'
 import { event } from './plugin/event'
 
 let uid = 0;
-
-global.MVVM = class {
+ 
+export default class MVVM {
     constructor(options) {
         this.$options = options;
         this._uid = uid++;
@@ -134,12 +134,8 @@ global.MVVM = class {
             target.splice(key, 1)
             return
         }
-        const ob = target.__ob__
-        if (target._isVue || (ob && ob.vmCount)) {
-            process.env.NODE_ENV !== 'production' && warn(
-                'Avoid deleting properties on a Vue instance or its root $data ' +
-                '- just set it to null.'
-            )
+        const ob = target.__ob__;
+        if (target._isVue || (ob && ob.vmCount)) { 
             return
         }
         if (!hasOwn(target, key)) {
@@ -251,6 +247,7 @@ global.MVVM = class {
 
 MVVM.use(directive);
 MVVM.use(event);
+global.MVVM = MVVM;
 //继承多个父类
 // function mix(...mixins) {
 //     class Mix { }

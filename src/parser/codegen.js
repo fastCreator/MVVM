@@ -1,6 +1,5 @@
 import { makeFunction } from './helpers'
-import { hooks } from '../directives'
-
+import MVVM from '../index'
 const fnExpRE = /^\s*([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/
 const simplePathRE = /^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['.*?']|\[".*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*\s*$/
 const modifierCode = {
@@ -34,6 +33,7 @@ export default function codeGen(ast) {
 
 function genElement(el) {
     //指令阶段
+    let hooks = el.vm.hooks;
     if (!el.processed) {
         el.processed = true;
         for (var hkey in hooks) {
@@ -133,7 +133,7 @@ function genData(el) {
     if (el.style) {
         data += 'style:' + genProps(el.style) + ','
     }
-    if (Object.keys(el.attrs).length) { 
+    if (Object.keys(el.attrs).length) {
         data += 'attrs:' + genProps(el.attrs) + ','
     }
     if (Object.keys(el.props).length) {
@@ -171,7 +171,7 @@ function genProps(props) {
     //     const prop = props[i]
     //     res += `"${prop.name}":${prop.value},`
     // } 
-    for (let key in props) {  
+    for (let key in props) {
         res += `"${key}":${props[key]},`
     }
     return res.slice(0, -1) + '}'

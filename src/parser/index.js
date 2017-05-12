@@ -1,6 +1,5 @@
 import HTMLParser from './html-parser'
-import TextParser from './text-parser'
-import { hooks } from '../directives'
+import TextParser from './text-parser' 
 import codeGen from './codegen'
 import { warn, camelize, isHTMLTag, isSVG } from '../utils'
 import {
@@ -27,6 +26,7 @@ export function compileToFunctions(template, vm) {
     let currentParent
     let options = vm.$options
     let stack = [];//记录当前节点位置:push,pop(树形)
+    let hooks =vm.hooks;
     //直接获取render函数
     if (cache[template]) {
         return cache[template]
@@ -39,6 +39,7 @@ export function compileToFunctions(template, vm) {
         //标签开始部位,unary:true 自闭合标签 exp:<br/>;false 闭合标签 <a></a>
         start: function (tag, attrs, unary) {
             const element = {
+                vm:vm,
                 type: 1,
                 tag,
                 //属性[{name:key,value:value},...]
@@ -128,52 +129,9 @@ export function compileToFunctions(template, vm) {
         }
     })
     //缓存template
-    //解析vnode为render函数
+    //解析vnode为render函数 
     return (cache[template] = codeGen(root))
 }
 
-function processKey(el) {
-    // TODO key 优化处理
-}
-
-function processAttrs(el) {
-    const list = el.attrsList
-    let i, l, name, rawName, value, arg, modifiers, isProp
-    for (i = 0, l = list.length; i < l; i++) {
-        name = rawName = list[i].name
-        value = list[i].value
-        if (dirRE.test(name)) {
-            // modifiers
-            modifiers = parseModifiers(name)
-            if (modifiers) {
-                name = name.replace(modifierRE, '')
-            }
-            if (bindRE.test(name)) { // v-bind
-                name = name.replace(bindRE, '')
-                if (modifiers) {
-                    if (modifiers.prop) {
-                        isProp = true
-                        name = camelize(name)
-                        if (name === 'innerHtml') name = 'innerHTML'
-                    }
-                    if (modifiers.camel) {
-                        name = camelize(name)
-                    }
-                }
-                if (isProp) {
-                    addProp(el, name, value)
-                } else {
-                    addAttr(el, name, value)
-                }
-            } else if (onRE.test(name)) { // v-on
-                name = name.replace(onRE, '')
-                addHandler(el, name, value, modifiers)
-            } else { // normal directives
-
-            }
-        } else {
-            addAttr(el, name, JSON.stringify(value))
-        }
-    }
-}
+ 
 
