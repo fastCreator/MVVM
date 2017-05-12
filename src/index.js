@@ -1,6 +1,6 @@
 import { observe } from './observer'
 import Watcher from './observer/watcher'
-import { query, warn, idToTemplate, toString, resolveAsset } from './utils'
+import { query, warn, idToTemplate, toString, resolveAsset, hasOwn } from './utils'
 import { initData, initComputed, initMethods, initWatch } from './instance/initState'
 import { compileToFunctions } from './parser'
 import { patch, h, VNode } from './vnode'
@@ -55,7 +55,7 @@ global.MVVM = class {
                 //直接从入口处获取template
             } else if (el) {
                 template = getOuterHTML(el)
-            } 
+            }
             //生成render函数
             if (template) {
                 //生成render函数
@@ -105,7 +105,7 @@ global.MVVM = class {
     }
 
     static $set(target, key, val) {
-        if (Array.isArray(target) && typeof key === 'number') {
+        if (Array.isArray(target) && Number(key) !== NaN) {
             target.length = Math.max(target.length, key)
             target.splice(key, 1, val)
             return val
@@ -115,11 +115,8 @@ global.MVVM = class {
             return val
         }
         const ob = target.__ob__
-        if (target._isVue || (ob && ob.vmCount)) {
-            process.env.NODE_ENV !== 'production' && warn(
-                'Avoid adding reactive properties to a Vue instance or its root $data ' +
-                'at runtime - declare it upfront in the data option.'
-            )
+        if (target._isMVVM || (ob && ob.vmCount)) {
+            //避免给根节点添加监听
             return val
         }
         if (!ob) {

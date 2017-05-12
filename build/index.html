@@ -17,9 +17,11 @@
       <h1 style="background:#ccc;">style</h1>
       <input value="attr" disabled data-a='123'>
       <br/>
-      <input id="a" value="model" m-model="a">
+      <input id="a" value="model" m-model="a">{{a}}
       <input value="{{obj}}">
       <input m-model="arr[0]">
+      <input m-model="obj.a.b">
+      <input m-model="arr">{{arr}}
       <img src="asd.jpg">
       <div onClick="alert(a);">alert</div>
       <c></c>

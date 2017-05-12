@@ -22,6 +22,7 @@ export const arrayMethods = Object.create(arrayProto);
         const result = original.apply(this, args)
         const ob = this.__ob__
         let inserted
+        //如果添加值，为添加的值添加监听者
         switch (method) {
             case 'push':
                 inserted = args

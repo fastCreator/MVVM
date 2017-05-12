@@ -16,7 +16,7 @@ export function initData(vm, data) {
         data = data()
     }
     //监听data get(收集依赖)/set(触发更新)
-    observe(data);
+    observe(data, true);
     vm.$data = data;
     const keys = Object.keys(data)
     let i = keys.length;
