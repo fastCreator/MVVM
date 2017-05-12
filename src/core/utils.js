@@ -27,6 +27,7 @@
 //bind
 //warn
 //nextTick
+//createElement
 //_set
 //cached
 //操作对象
@@ -34,6 +35,9 @@
 //parsePath 
 
 
+export function createElement(tagName) {
+    return document.createElement(tagName);
+}
 
 
 //判断是不是可移除属性

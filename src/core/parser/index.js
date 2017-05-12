@@ -1,5 +1,5 @@
 import HTMLParser from './html-parser'
-import TextParser from './text-parser' 
+import TextParser from './text-parser'
 import codeGen from './codegen'
 import { warn, camelize, isHTMLTag, isSVG } from '../utils'
 import {
@@ -26,7 +26,7 @@ export function compileToFunctions(template, vm) {
     let currentParent
     let options = vm.$options
     let stack = [];//记录当前节点位置:push,pop(树形)
-    let hooks =vm.hooks;
+    let hooks = vm.hooks;
     //直接获取render函数
     if (cache[template]) {
         return cache[template]
@@ -39,7 +39,7 @@ export function compileToFunctions(template, vm) {
         //标签开始部位,unary:true 自闭合标签 exp:<br/>;false 闭合标签 <a></a>
         start: function (tag, attrs, unary) {
             const element = {
-                vm:vm,
+                vm: vm,
                 type: 1,
                 tag,
                 //属性[{name:key,value:value},...]
@@ -54,6 +54,7 @@ export function compileToFunctions(template, vm) {
                 isComponent: !isHTMLTag(tag) && !isSVG(tag),
                 nativeEvents: {},
                 style: null,
+                hook: {},
                 props: {},//DOM属性
                 attrs: {}//值为true,false则移除该属性
             }
@@ -75,13 +76,13 @@ export function compileToFunctions(template, vm) {
             }
             //设置样式
             setElStyle(element);
-            setElAttrs(element,vm.$options.delimiters);
+            setElAttrs(element, vm.$options.delimiters);
             //待实现
             // processKey(element)
             // processAttrs(element)
 
             if (!root) {
-                vm.$vnode = root = element
+                vm.$vnode = root = element 
             }
 
             if (currentParent && !element.forbidden) {
@@ -133,5 +134,5 @@ export function compileToFunctions(template, vm) {
     return (cache[template] = codeGen(root))
 }
 
- 
+
 

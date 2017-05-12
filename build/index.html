@@ -36,7 +36,14 @@
     var vm = new MVVM({
       el: '#to',
       template: '#app',
-      delimiters: ['{{', '}}'],
+      components: {
+        c: {
+          template: "<div>{{a}}</div>",
+          data: {
+            a: 1
+          }
+        }
+      },
       data: {
         a: false,
         title: '标题',

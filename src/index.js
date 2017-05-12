@@ -1,6 +1,5 @@
-import { observe } from './core/observer'
 import Watcher from './core/observer/watcher'
-import { query, warn, idToTemplate, toString, resolveAsset, hasOwn } from './core/utils'
+import { query, warn, idToTemplate, toString, resolveAsset, hasOwn, isFunction, createElement } from './core/utils'
 import { initData, initComputed, initMethods, initWatch } from './core/instance/initState'
 import { compileToFunctions } from './core/parser'
 import { patch, h, VNode } from './core/vnode'
@@ -11,9 +10,10 @@ let uid = 0;
 export default class MVVM {
     constructor(options) {
         this.$options = options;
+        this.$options.delimiters = this.$options.delimiters || ["{{", "}}"]
         this._uid = uid++;
         callHook(this, 'beforeCreate')
-        if (options.data) {
+        if (options.data) { 
             initData(this, options.data)
         }
         if (options.computed) {
@@ -55,7 +55,7 @@ export default class MVVM {
         defineReactive(ob.value, key, val)
         ob.dep.notify()
         return val
-    } 
+    }
     static $delete(target, key) {
         if (Array.isArray(target) && typeof key === 'number') {
             target.splice(key, 1)
@@ -74,11 +74,12 @@ export default class MVVM {
         }
         ob.dep.notify()
     }
-
     $mount(el) {
+       
         let options = this.$options;
         //渲染入口
         this.$el = el = el && query(el);
+         console.log(this.$el );
         //判断是否用户自定义render h函数,则不需要template
         if (!options.render) {
             //获取template
@@ -114,9 +115,9 @@ export default class MVVM {
             // this._update(this._render())
             var vm = this;
             this._watcher = new Watcher(this,
-                function () { vm._update(vm._render(), h); },
+                function () { vm._update(vm._render(), this._h); },
                 function updateComponent() {
-                    vm._update(vm._render(), hydrating);
+                    vm._update(vm._render(), this._h);
                 });
         }
 
@@ -126,7 +127,7 @@ export default class MVVM {
         }
 
         return this
-    } 
+    }
     $watch(expOrFn, cb, options) {
         const vm = this
         options = options || {}
@@ -138,24 +139,25 @@ export default class MVVM {
         return function unwatchFn() {
             watcher.teardown()
         }
-    } 
-    $forceUpdate() {
-        this._watcher.update();
     }
- 
+    $forceUpdate() {
+        //console.log();
+        return this._render()
+    }
+
     _patch = patch
-    _s = toString 
+    _s = toString
     _render() {
         let render = this.$options.render
         let vnode
         try {
             //自动解析的template不需要h,用户自定义的函数需要h
-            vnode = render.call(this, h);
+            vnode = render.call(this, this._h);
         } catch (e) {
             warn(`render Error : ${e}`)
         }
         return vnode
-    } 
+    }
     _update(vnode) {
         if (this._isMounted) {
             callHook(this, 'beforeUpdate')
@@ -177,7 +179,7 @@ export default class MVVM {
     //渲染template和component
     _h(sel, data, children) {
         data = data || {}
-
+        //没有attr时,child顶上 
         if (Array.isArray(data)) {
             children = data
             data = {}
@@ -235,11 +237,74 @@ export default class MVVM {
         }
         return ret
     }
+    //创建组件
+    //子组件option,属性,子元素,tag
+    _createComponent(Ctor, data, children, sel) {
+        Ctor = mergeOptions(Ctor)
+        Ctor._isComponent = true
+        let Factory = this.constructor
+        let parentData = this.$data
 
-} 
+        data.hook.init = (vnode) => { 
+            console.log(vnode);
+            Ctor.data = Ctor.data || {};
+            let componentVm = new Factory(Ctor)
+            componentVm.parent = this;
+            //<compont attr="{{a}}">
+            //写在调用父组件值
+            for (let key in data.attrs) {
+                Object.defineProperty(componentVm, key, {
+                    configurable: true,
+                    enumerable: true,
+                    get: function proxyGetter() {
+                        return parentData[key]
+                    }
+                })
+            }
+            //手动调用更新 
+            vnode.children =[componentVm.$forceUpdate()];
+        }
+        Ctor._vnode = new VNode(`MVVM-component-${sel}`, data, [], undefined, createElement(sel))
+        console.log(Ctor._vnode)
+
+        return Ctor._vnode
+    }
+}
 MVVM.use(directive);
 MVVM.use(event);
 global.MVVM = MVVM;
+
+
+
+//获取data 因为data有可能为
+function mergeOptions(options) {
+    let opt = Object.assign({}, options)
+    let data = opt.data
+    if (isFunction(data)) {
+        opt.data = data()
+    }
+    return opt
+}
+
+//生命周期钩子函数
+function callHook(vm, hook) {
+    const handlers = vm.$options[hook]
+    if (handlers) {
+        if (Array.isArray(handlers)) {
+            for (let i = 0, j = handlers.length; i < j; i++) {
+                try {
+                    handlers[i].call(vm)
+                } catch (e) {
+                    handleError(e, vm, `${hook} hook`)
+                }
+            }
+        } else {
+            handlers.call(vm)
+        }
+
+    }
+}
+
 //继承多个父类
 // function mix(...mixins) {
 //     class Mix { }
@@ -262,24 +327,6 @@ global.MVVM = MVVM;
 //     }
 // }
 
-//生命周期钩子函数
-function callHook(vm, hook) {
-    const handlers = vm.$options[hook]
-    if (handlers) {
-        if (Array.isArray(handlers)) {
-            for (let i = 0, j = handlers.length; i < j; i++) {
-                try {
-                    handlers[i].call(vm)
-                } catch (e) {
-                    handleError(e, vm, `${hook} hook`)
-                }
-            }
-        } else {
-            handlers.call(vm)
-        }
-
-    }
-}
 
 
 //init.js

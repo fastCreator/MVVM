@@ -1,4 +1,4 @@
-import { makeFunction } from './helpers' 
+import { makeFunction } from './helpers'
 const fnExpRE = /^\s*([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/
 const simplePathRE = /^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['.*?']|\[".*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*\s*$/
 const modifierCode = {
@@ -78,42 +78,6 @@ function genChildren(el, checkSkip) {
     }
 }
 
-function genIf(el) {
-    el.ifProcessed = true // avoid recursion
-    return genIfConditions(el.ifConditions.slice())
-}
-
-function genIfConditions(conditions) {
-    if (!conditions.length) {
-        return "''"
-    }
-
-    var condition = conditions.shift()
-    if (condition.exp) {
-        return `(${condition.exp})?${genTernaryExp(condition.block)}:${genIfConditions(conditions)}`
-    } else {
-        return `${genTernaryExp(condition.block)}`
-    }
-
-    // v-if with v-once should generate code like (a)?_m(0):_m(1)
-    function genTernaryExp(el) {
-        return genElement(el)
-    }
-}
-//解析m-for
-function genFor(el) {
-    const exp = el.for
-    const alias = el.alias
-    const iterator1 = el.iterator1 ? `,${el.iterator1}` : ''
-    const iterator2 = el.iterator2 ? `,${el.iterator2}` : ''
-    el.forProcessed = true // avoid recursion
-
-    return `_l((${exp}),` +
-        `function(${alias}${iterator1}${iterator2}){` +
-        `return ${genElement(el)}` +
-        '})'
-}
-
 function genNode(node) {
     if (node.type === 1) {
         return genElement(node)
@@ -139,89 +103,19 @@ function genData(el) {
         data += 'props:' + genProps(el.props) + ','
     }
     if (Object.keys(el.events).length) {
-        console.log(el.events);
         data += 'on:' + genProps(el.events) + ','
     }
-    // if (el.attrsMap) {
-    //     // data += JSON.stringify({style:{background:'#ccc'}, on: { click:  'this.test'}});
-    //     data += '{on:{click:function(){alert(1)}}}'
-    //     // data += `attrs:{${genProps(el.attrsMap)}},`
-    // } 
-    // // DOM props
-    // if (el.props) {
-    //     data += `props:{${genProps(el.props)}},`
-    // }
-    // event handlers
-    //tofix
-    // if (el.events) {
-    //     data += `${genHandlers(el.events)},`
-    // }
-    // if (el.nativeEvents) {
-    //     data += `${genHandlers(el.nativeEvents, true)},`
-    // }
-
+    if (Object.keys(el.hook).length) {
+        data += 'hook:' + genProps(el.hook) + ','
+    }
     data = data.replace(/,$/, '') + '}'
     return data
 }
 
 function genProps(props) {
-    let res = '{'
-    // for (let i = 0; i < props.length; i++) {
-    //     const prop = props[i]
-    //     res += `"${prop.name}":${prop.value},`
-    // } 
+    let res = '{';
     for (let key in props) {
         res += `"${key}":${props[key]},`
     }
     return res.slice(0, -1) + '}'
-}
-
-function genHandlers(events, native) {
-    let res = native ? 'nativeOn:{' : 'on:{'
-    for (const name in events) {
-        res += `"${name}":${genHandler(name, events[name])},`
-    }
-    return res.slice(0, -1) + '}'
-}
-
-function genHandler(name, handler) {
-    if (!handler) {
-        return 'function(){}'
-    } else if (Array.isArray(handler)) {
-        return `[${handler.map(handler => genHandler(name, handler)).join(',')}]`
-    } else if (!handler.modifiers) {
-        return fnExpRE.test(handler.value) || simplePathRE.test(handler.value)
-            ? handler.value
-            : `function($event){${handler.value}}`
-    } else {
-        let code = ''
-        const keys = []
-        for (const key in handler.modifiers) {
-            if (modifierCode[key]) {
-                code += modifierCode[key]
-            } else {
-                keys.push(key)
-            }
-        }
-        if (keys.length) {
-            code = genKeyFilter(keys) + code
-        }
-        const handlerCode = simplePathRE.test(handler.value)
-            ? handler.value + '($event)'
-            : handler.value
-        return 'function($event){' + code + handlerCode + '}'
-    }
-}
-
-function genKeyFilter(keys) {
-    return `if(${keys.map(genFilterCode).join('&&')})return;`
-}
-
-function genFilterCode(key) {
-    const keyVal = parseInt(key, 10)
-    if (keyVal) {
-        return `$event.keyCode!==${keyVal}`
-    }
-    const alias = keyCodes[key]
-    return `_k($event.keyCode,${JSON.stringify(key)}${alias ? ',' + JSON.stringify(alias) : ''})`
 }
