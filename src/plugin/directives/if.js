@@ -6,6 +6,6 @@ export const directiveIf = {
     },
     vnode2render: function (el, genElement) {
         var exp = el.if.expression;
-        return `${exp}?${genElement(el)}:''`;
+        return `${exp}?${genElement(el)}:$children[0].$destroy`;
     }
 }

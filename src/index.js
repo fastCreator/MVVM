@@ -1,5 +1,5 @@
 import Watcher from './core/observer/watcher'
-import { query, warn, idToTemplate, toString, resolveAsset, hasOwn, isFunction, createElement } from './core/utils'
+import { query, warn, idToTemplate, toString, resolveAsset, hasOwn, isFunction, createElement, remove } from './core/utils'
 import { initData, initComputed, initMethods, initWatch } from './core/instance/initState'
 import { compileToFunctions } from './core/parser'
 import { patch, h, VNode } from './core/vnode'
@@ -148,7 +148,26 @@ export default class MVVM {
         //console.log();
         return this._render()
     }
-
+    $destroy() {
+        const vm = this
+        callHook(this, 'beforeDestroy');
+        if (this.$parent) {
+            remove(this.$parent.$children, vm)
+        }
+        if (vm._watcher) {
+            vm._watcher.teardown()
+        }
+        let i = vm._watchers.length
+        while (i--) {
+            vm._watchers[i].teardown()
+        }
+        if (vm.$data.__ob__) {
+            vm.$data.__ob__.vmCount--
+        }
+        vm._patch(this.$el, { key: this._uid });
+        callHook(vm, 'destroyed');
+        vm.$off(); 
+    }
     _patch = patch
     _s = toString
     _render() {
@@ -170,7 +189,7 @@ export default class MVVM {
         this._vnode = vnode
 
         if (!prevVnode) {
-            console.log(vnode)
+            vnode.key = this._uid;
             this.$el = this._patch(this.$el, vnode)
         } else {
             this.$el = this._patch(prevVnode, vnode)
@@ -228,14 +247,14 @@ export default class MVVM {
         data.hook.insert = (vnode) => {
             Ctor.data = Ctor.data || {};
             console.log(vnode.data)
-            Ctor.el = vnode.elm; 
+            Ctor.el = vnode.elm;
             let componentVm = new Factory(Ctor);
             componentVm._isComponent = true
-            componentVm.parent = this;
-            (this._components || (this._components = [])).push(componentVm);
+            componentVm.$parent = this;
+            (this.$children || (this.$children = [])).push(componentVm);
             //写在调用父组件值
             for (let key in data.attrs) {
-                if(Ctor.data[key]) {
+                if (Ctor.data[key]) {
                     warn(`data:${key},已存在`);
                     continue;
                 }
