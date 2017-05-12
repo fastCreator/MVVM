@@ -112,3 +112,6 @@ postpatch	一个元素已被修补	oldVnode, vnode
 destroy	直接或间接地删除元素	vnode
 remove	一个元素直接从DOM中删除	vnode, removeCallback
 post	补丁过程完成	没有
+
+
+//万物皆插件
