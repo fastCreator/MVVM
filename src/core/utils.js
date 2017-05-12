@@ -9,8 +9,7 @@
 //strTodom
 //idToTemplate
 //camelize
-//capitalize
-//toArray
+//capitalize 
 //判断
 //isDom
 //isObject
@@ -36,15 +35,7 @@
 
 
 
-export function toArray(list, start) {
-    start = start || 0
-    let i = list.length - start
-    const ret = new Array(i)
-    while (i--) {
-        ret[i] = list[i + start]
-    }
-    return ret
-}
+
 //判断是不是可移除属性
 export const isAttr = makeMap(
     'accept,accept-charset,accesskey,action,align,alt,async,autocomplete,' +

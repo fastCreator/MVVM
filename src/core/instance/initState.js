@@ -28,6 +28,7 @@ export function initData(vm, data) {
 
 //初始化计算属性
 const computedWatcherOptions = { lazy: true }
+
 export function initComputed(vm, computed) {
     //存放计算属性，user watch,render watch
     vm._watchers = [];

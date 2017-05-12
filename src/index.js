@@ -8,7 +8,6 @@ import { directive } from './plugin/directives'
 import { event } from './plugin/event'
 
 let uid = 0;
- 
 export default class MVVM {
     constructor(options) {
         this.$options = options;
@@ -33,6 +32,47 @@ export default class MVVM {
 
     static use(plugin) {
         plugin && plugin.install && plugin.install.call(this, MVVM);
+    }
+    static $set(target, key, val) {
+        if (Array.isArray(target) && Number(key) !== NaN) {
+            target.length = Math.max(target.length, key)
+            target.splice(key, 1, val)
+            return val
+        }
+        if (hasOwn(target, key)) {
+            target[key] = val
+            return val
+        }
+        const ob = target.__ob__
+        if (target._isMVVM || (ob && ob.vmCount)) {
+            //避免给根节点添加监听
+            return val
+        }
+        if (!ob) {
+            target[key] = val
+            return val
+        }
+        defineReactive(ob.value, key, val)
+        ob.dep.notify()
+        return val
+    } 
+    static $delete(target, key) {
+        if (Array.isArray(target) && typeof key === 'number') {
+            target.splice(key, 1)
+            return
+        }
+        const ob = target.__ob__;
+        if (target._isVue || (ob && ob.vmCount)) {
+            return
+        }
+        if (!hasOwn(target, key)) {
+            return
+        }
+        delete target[key]
+        if (!ob) {
+            return
+        }
+        ob.dep.notify()
     }
 
     $mount(el) {
@@ -86,8 +126,7 @@ export default class MVVM {
         }
 
         return this
-    }
-
+    } 
     $watch(expOrFn, cb, options) {
         const vm = this
         options = options || {}
@@ -99,58 +138,13 @@ export default class MVVM {
         return function unwatchFn() {
             watcher.teardown()
         }
-    }
-
+    } 
     $forceUpdate() {
         this._watcher.update();
     }
-
-    static $set(target, key, val) {
-        if (Array.isArray(target) && Number(key) !== NaN) {
-            target.length = Math.max(target.length, key)
-            target.splice(key, 1, val)
-            return val
-        }
-        if (hasOwn(target, key)) {
-            target[key] = val
-            return val
-        }
-        const ob = target.__ob__
-        if (target._isMVVM || (ob && ob.vmCount)) {
-            //避免给根节点添加监听
-            return val
-        }
-        if (!ob) {
-            target[key] = val
-            return val
-        }
-        defineReactive(ob.value, key, val)
-        ob.dep.notify()
-        return val
-    }
-
-    static $delete(target, key) {
-        if (Array.isArray(target) && typeof key === 'number') {
-            target.splice(key, 1)
-            return
-        }
-        const ob = target.__ob__;
-        if (target._isVue || (ob && ob.vmCount)) { 
-            return
-        }
-        if (!hasOwn(target, key)) {
-            return
-        }
-        delete target[key]
-        if (!ob) {
-            return
-        }
-        ob.dep.notify()
-    }
-
+ 
     _patch = patch
-    _s = toString
-
+    _s = toString 
     _render() {
         let render = this.$options.render
         let vnode
@@ -161,8 +155,7 @@ export default class MVVM {
             warn(`render Error : ${e}`)
         }
         return vnode
-    }
-
+    } 
     _update(vnode) {
         if (this._isMounted) {
             callHook(this, 'beforeUpdate')
@@ -243,8 +236,7 @@ export default class MVVM {
         return ret
     }
 
-}
-
+} 
 MVVM.use(directive);
 MVVM.use(event);
 global.MVVM = MVVM;
