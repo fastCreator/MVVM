@@ -30,8 +30,7 @@ export function initData(vm, data) {
 const computedWatcherOptions = { lazy: true }
 
 export function initComputed(vm, computed) {
-    //存放计算属性，user watch,render watch
-    vm._watchers = [];
+    //存放计算属性，user watch,render watch 
     const watchers = vm._computedWatchers = Object.create(null)
     for (const key in computed) {
         const userDef = computed[key]

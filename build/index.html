@@ -24,7 +24,7 @@
       <input m-model="arr">{{arr}}
       <img src="asd.jpg">
       <div onClick="alert(a);">alert</div>
-      <c></c>
+      <c m-if="a" a></c>
       <ul>
         <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
       </ul>
@@ -40,7 +40,7 @@
         c: {
           template: "<div>{{a}}</div>",
           data: {
-            a: 1
+            a: '子组建的值'
           }
         }
       },

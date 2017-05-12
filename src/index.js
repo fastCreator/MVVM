@@ -12,10 +12,13 @@ export default class MVVM {
         this.$options = options;
         this.$options.delimiters = this.$options.delimiters || ["{{", "}}"]
         this._uid = uid++;
+        this._watchers = [];
+        console.log('const')
         callHook(this, 'beforeCreate')
-        if (options.data) { 
+        if (options.data) {
             initData(this, options.data)
         }
+
         if (options.computed) {
             initComputed(this, options.computed)
         }
@@ -75,11 +78,11 @@ export default class MVVM {
         ob.dep.notify()
     }
     $mount(el) {
-       
+
         let options = this.$options;
         //渲染入口
         this.$el = el = el && query(el);
-         console.log(this.$el );
+        console.log(this.$el);
         //判断是否用户自定义render h函数,则不需要template
         if (!options.render) {
             //获取template
@@ -109,17 +112,18 @@ export default class MVVM {
 
         callHook(this, 'beforeMount')
 
-        if (!options._isComponent) {
-            //更新dom 
+        //if (!options._isComponent) {
+        //更新dom 
 
-            // this._update(this._render())
-            var vm = this;
-            this._watcher = new Watcher(this,
-                function () { vm._update(vm._render(), this._h); },
-                function updateComponent() {
-                    vm._update(vm._render(), this._h);
-                });
-        }
+        // this._update(this._render())
+        var vm = this;
+        this._watcher = new Watcher(this,
+            function () { console.log('gengxin' + this._uid); vm._update(vm._render(), this._h); },
+            function updateComponent() {
+                console.log('更行');
+                vm._update(vm._render(), this._h);
+            });
+        //}
 
         if (!this._vnode) {
             this._isMounted = true
@@ -214,6 +218,39 @@ export default class MVVM {
 
         return h(sel, data, children)
     }
+    //创建组件
+    //子组件option,属性,子元素,tag
+    _createComponent(Ctor, data, children, sel) {
+        Ctor.data = mergeOptions(Ctor.data)
+
+        let Factory = this.constructor
+        let parentData = this.$data
+        data.hook.insert = (vnode) => {
+            Ctor.data = Ctor.data || {};
+            console.log(vnode.data)
+            Ctor.el = vnode.elm; 
+            let componentVm = new Factory(Ctor);
+            componentVm._isComponent = true
+            componentVm.parent = this;
+            (this._components || (this._components = [])).push(componentVm);
+            //写在调用父组件值
+            for (let key in data.attrs) {
+                if(Ctor.data[key]) {
+                    warn(`data:${key},已存在`);
+                    continue;
+                }
+                Object.defineProperty(componentVm, key, {
+                    configurable: true,
+                    enumerable: true,
+                    get: function proxyGetter() {
+                        return parentData[key]
+                    }
+                })
+            }
+        }
+        Ctor._vnode = new VNode(sel, data, [], undefined, createElement(sel));
+        return Ctor._vnode
+    }
     //渲染for时,返回多个render
     _l(val, render) {
         let ret, i, l, keys, key
@@ -237,38 +274,7 @@ export default class MVVM {
         }
         return ret
     }
-    //创建组件
-    //子组件option,属性,子元素,tag
-    _createComponent(Ctor, data, children, sel) {
-        Ctor = mergeOptions(Ctor)
-        Ctor._isComponent = true
-        let Factory = this.constructor
-        let parentData = this.$data
 
-        data.hook.init = (vnode) => { 
-            console.log(vnode);
-            Ctor.data = Ctor.data || {};
-            let componentVm = new Factory(Ctor)
-            componentVm.parent = this;
-            //<compont attr="{{a}}">
-            //写在调用父组件值
-            for (let key in data.attrs) {
-                Object.defineProperty(componentVm, key, {
-                    configurable: true,
-                    enumerable: true,
-                    get: function proxyGetter() {
-                        return parentData[key]
-                    }
-                })
-            }
-            //手动调用更新 
-            vnode.children =[componentVm.$forceUpdate()];
-        }
-        Ctor._vnode = new VNode(`MVVM-component-${sel}`, data, [], undefined, createElement(sel))
-        console.log(Ctor._vnode)
-
-        return Ctor._vnode
-    }
 }
 MVVM.use(directive);
 MVVM.use(event);
