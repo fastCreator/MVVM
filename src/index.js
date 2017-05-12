@@ -166,7 +166,7 @@ export default class MVVM {
         }
         vm._patch(this.$el, { key: this._uid });
         callHook(vm, 'destroyed');
-        vm.$off(); 
+        vm.$off();
     }
     _patch = patch
     _s = toString
@@ -241,14 +241,14 @@ export default class MVVM {
     //子组件option,属性,子元素,tag
     _createComponent(Ctor, data, children, sel) {
         Ctor.data = mergeOptions(Ctor.data)
-
+        let componentVm;
         let Factory = this.constructor
         let parentData = this.$data
         data.hook.insert = (vnode) => {
             Ctor.data = Ctor.data || {};
-            console.log(vnode.data)
+            console.log(vnode.data);
             Ctor.el = vnode.elm;
-            let componentVm = new Factory(Ctor);
+            componentVm = new Factory(Ctor);
             componentVm._isComponent = true
             componentVm.$parent = this;
             (this.$children || (this.$children = [])).push(componentVm);
@@ -267,7 +267,11 @@ export default class MVVM {
                 })
             }
         }
-        Ctor._vnode = new VNode(sel, data, [], undefined, createElement(sel));
+        data.hook.destroy = () => {
+            componentVm && componentVm.$destroy();
+            console.log('一处2');
+        }
+        Ctor._vnode = new VNode(sel, data, [], undefined);
         return Ctor._vnode
     }
     //渲染for时,返回多个render
