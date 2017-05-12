@@ -1,5 +1,4 @@
-import { makeFunction } from './helpers'
-import MVVM from '../index'
+import { makeFunction } from './helpers' 
 const fnExpRE = /^\s*([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/
 const simplePathRE = /^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['.*?']|\[".*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*\s*$/
 const modifierCode = {
