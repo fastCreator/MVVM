@@ -5,6 +5,7 @@ import { initData, initComputed, initMethods, initWatch } from './instance/initS
 import { compileToFunctions } from './parser'
 import { patch, h, VNode } from './vnode'
 import { directive } from './directives'
+import { event } from './plugin/event'
 
 let uid = 0;
 
@@ -249,7 +250,7 @@ global.MVVM = class {
 }
 
 MVVM.use(directive);
-
+MVVM.use(event);
 //继承多个父类
 // function mix(...mixins) {
 //     class Mix { }
