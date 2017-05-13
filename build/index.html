@@ -12,24 +12,39 @@
 
   <script id="app" type="text/html">
     <div>
-      <h1 m-if="arr[0]">显示{{title}}</h1>
-      <h1 m-on:click="test">点击事件</h1>
-      <h1 style="background:#ccc;">style</h1>
-      <input value="attr" disabled data-a='123'>
-      <br/>
-      <input id="a" value="model" m-model="a">{{a}}
+      <h2>绑定</h2>
       <input value="{{obj}}">
+      <div>{{title}}</div>
+      <br>
+      <hr>
+      <h2>计算属性</h2>
+      <div>{{title2}}</div>
+      <br>
+      <hr>
+      <h2>m-model</h2>
       <input m-model="arr[0]">
-      <input m-model="obj.a.b">
-      <input m-model="arr">{{arr}}
-      <img src="asd.jpg">
-      <div onClick="alert(a);">alert</div>
-      <c m-if="a" a></c>
+      <div>{{arr}}</div>
+      <br>
+      <hr>
+      <h2>m-click</h2>
+      <div m-on:click="test">点击触发</div>
+      <br>
+      <hr>
+      <h2>m-if</h2>
+      <h1 m-if="show">显示{{title}}</h1>
+      <button m-on:click="toggle">点击显示/隐藏</button>
+      <br>
+      <hr>
+      <h2>m-for</h2>
       <ul>
         <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
       </ul>
-      <h2>{{title2}}</h2>
-      <h2>{{title3}}</h2>
+      <br>
+      <hr>
+      <h2>子组件</h2>
+      <c m-if="cshow" arr></c>
+      <br>
+      <button m-on:click="togglec">点击摧毁/生成子组件</button>
     </div>
   </script>
   <script>
@@ -38,14 +53,27 @@
       template: '#app',
       components: {
         c: {
-          template: "<div>{{a}}</div>",
+          template: "<div><div>{{a}}</div><button m-on:click='showP'>获取父元素arr值</button><div>",
           data: {
-            a: '子组建的值'
+            a: '我是子组件'
+          },
+          methods: {
+            showP: function () {
+              alert(this.arr);
+            }
+          },
+          beforeCreate: function () {
+            console.log('生成子组件')
+          },
+          beforeDestroy: function () {
+            console.log('子组件被摧毁了')
           }
         }
       },
       data: {
         a: true,
+        show: true,
+        cshow: true,
         title: '标题',
         obj: { a: { b: 2 } },
         arr: [1, 0, 3, 4, 5],
@@ -77,7 +105,14 @@
       },
       methods: {
         test: function () {
-          console.log(this.a);
+          alert(this.title + '点击');
+        },
+        toggle: function () {
+          this.show = !this.show;
+        },
+        togglec: function () {
+          console.log('togglec');
+          this.cshow = !this.cshow;
         }
       },
       beforeCreate: function () {

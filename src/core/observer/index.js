@@ -78,8 +78,7 @@ export function defineReactive(obj, key, val, customSetter) {
                 val = newVal
             }
             childOb = observe(newVal)
-            //触发更新
-            console.log('更新')
+            //触发更新 
             dep.notify()
         }
     })

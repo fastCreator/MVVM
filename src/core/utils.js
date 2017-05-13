@@ -288,7 +288,7 @@ export const nextTick = (function () {
                 try {
                     cb.call(ctx)
                 } catch (e) {
-                    warn(ctx)
+                    warn('queueNextTick:'+ctx)
                 }
             } else if (_resolve) {
                 _resolve(ctx)

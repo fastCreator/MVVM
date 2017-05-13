@@ -5,10 +5,7 @@ export const directiveIf = {
 
     },
     vnode2render: function (el, genElement) {
-        var exp = el.if.expression;
-        if(el.isComponent){
-            
-        }
+        var exp = el.if.expression;  
         return `${exp}?${genElement(el)}:''`;
     }
 }

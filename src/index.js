@@ -1,5 +1,5 @@
 import Watcher from './core/observer/watcher'
-import { query, warn, idToTemplate, toString, resolveAsset, hasOwn, isFunction, createElement, remove } from './core/utils'
+import { query, warn, idToTemplate, toString, resolveAsset, hasOwn, isFunction, createElement, remove, bind } from './core/utils'
 import { initData, initComputed, initMethods, initWatch } from './core/instance/initState'
 import { compileToFunctions } from './core/parser'
 import { patch, h, VNode } from './core/vnode'
@@ -13,7 +13,6 @@ export default class MVVM {
         this.$options.delimiters = this.$options.delimiters || ["{{", "}}"]
         this._uid = uid++;
         this._watchers = [];
-        console.log('const')
         callHook(this, 'beforeCreate')
         if (options.data) {
             initData(this, options.data)
@@ -82,7 +81,6 @@ export default class MVVM {
         let options = this.$options;
         //渲染入口
         this.$el = el = el && query(el);
-        console.log(this.$el);
         //判断是否用户自定义render h函数,则不需要template
         if (!options.render) {
             //获取template
@@ -105,7 +103,6 @@ export default class MVVM {
             if (template) {
                 //生成render函数
                 const render = compileToFunctions(template, this);
-                console.log(render);
                 options.render = render;
             }
         }
@@ -118,9 +115,8 @@ export default class MVVM {
         // this._update(this._render())
         var vm = this;
         this._watcher = new Watcher(this,
-            function () { console.log('gengxin' + this._uid); vm._update(vm._render(), this._h); },
+            function () { vm._update(vm._render(), this._h); },
             function updateComponent() {
-                console.log('更行');
                 vm._update(vm._render(), this._h);
             });
         //}
@@ -145,10 +141,10 @@ export default class MVVM {
         }
     }
     $forceUpdate() {
-        //console.log();
         return this._render()
     }
     $destroy() {
+        console.log('$destroy');
         const vm = this
         callHook(this, 'beforeDestroy');
         if (this.$parent) {
@@ -190,6 +186,11 @@ export default class MVVM {
 
         if (!prevVnode) {
             vnode.key = this._uid;
+            // this.$el.hook={};
+            // this.$el.hook.destroy = () => {
+            //     console.log('2');
+            //     componentVm && componentVm.$destroy();
+            // }
             this.$el = this._patch(this.$el, vnode)
         } else {
             this.$el = this._patch(prevVnode, vnode)
@@ -197,7 +198,6 @@ export default class MVVM {
         if (this._isMounted) {
             callHook(this, 'updated')
         }
-        console.log('vnode', this.$e);
     }
     //渲染template和component
     _h(sel, data, children) {
@@ -211,6 +211,7 @@ export default class MVVM {
         data.hook = data.hook || {}
 
         if (this.$options.destroy) {
+            alert('xxxxx');
             data.hook.destroy = bind(this.$options.destroy, this)
         }
 
@@ -231,6 +232,7 @@ export default class MVVM {
         if (typeof sel == 'string') {
             let Ctor = resolveAsset(this.$options, 'components', sel)
             if (Ctor) {
+                console.log(Ctor);
                 return this._createComponent(Ctor, data, children, sel)
             }
         }
@@ -240,13 +242,14 @@ export default class MVVM {
     //创建组件
     //子组件option,属性,子元素,tag
     _createComponent(Ctor, data, children, sel) {
-        Ctor.data = mergeOptions(Ctor.data)
+        Ctor.data = mergeOptions(Ctor.data);
+        console.log('1')
         let componentVm;
         let Factory = this.constructor
         let parentData = this.$data
         data.hook.insert = (vnode) => {
+            console.log('插入');
             Ctor.data = Ctor.data || {};
-            console.log(vnode.data);
             Ctor.el = vnode.elm;
             componentVm = new Factory(Ctor);
             componentVm._isComponent = true
@@ -267,10 +270,7 @@ export default class MVVM {
                 })
             }
         }
-        data.hook.destroy = () => {
-            componentVm && componentVm.$destroy();
-            console.log('一处2');
-        }
+
         Ctor._vnode = new VNode(sel, data, [], undefined);
         return Ctor._vnode
     }
