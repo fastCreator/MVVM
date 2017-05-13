@@ -181,8 +181,8 @@ export default class MVVM {
         if (this._isMounted) {
             callHook(this, 'beforeUpdate')
         }
-        const prevVnode = this._vnode || this.$options._vnode
-        this._vnode = vnode
+        const prevVnode = this._vnode
+        this._vnode = vnode;
 
         if (!prevVnode) {
             vnode.key = this._uid;
@@ -193,6 +193,8 @@ export default class MVVM {
             // }
             this.$el = this._patch(this.$el, vnode)
         } else {
+            //vnode.key = this._uid;
+            prevVnode.key = this._uid;
             this.$el = this._patch(prevVnode, vnode)
         }
         if (this._isMounted) {
@@ -271,7 +273,7 @@ export default class MVVM {
             }
         }
 
-        Ctor._vnode = new VNode(sel, data, [], undefined);
+        Ctor._vnode = new VNode(sel, data, [], undefined,createElement(sel));
         return Ctor._vnode
     }
     //渲染for时,返回多个render
