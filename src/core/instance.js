@@ -1,7 +1,7 @@
-import { observe } from '../observer/index';
-import Dep from '../observer/dep';
-import Watcher from '../observer/watcher';
-import { noop, warn, isPlainObject, isFunction, bind } from '../utils';
+import { observe } from './observer';
+import Dep from './observer/dep';
+import Watcher from './observer/watcher';
+import { noop, warn, isPlainObject, isFunction, bind } from './utils';
 
 const sharedPropertyDefinition = {
     enumerable: true,

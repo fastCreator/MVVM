@@ -9,6 +9,7 @@
 5，高效的性能,Virtual DOM + 基于es5的observe
 6，更少的代码，VUE.use 以插件的形式，方便用户扩展与选择
 
+# demo
 
 # 如何快速实现VUE框架
 Vue 一个 MVVM 框架、一个响应式的组件系统，通过把页面抽象成一个个组件来增加复用性、降低复杂性
@@ -169,7 +170,7 @@ Object.defineProperty(obj, key, {
 下面我们来开始自己动手写一个类似VUE的框架
 
 ### 实现思路
-![目录结构](./docImg/核心流程.png) 
+![目录结构](./docImg/实现思路.png) 
 
 ### 目录结构 
 ![目录结构](./docImg/MVVM目录结构.png) 
@@ -177,37 +178,56 @@ Object.defineProperty(obj, key, {
 ## 部分源码解析
 ### nextTick
 1,实现方法（1,promise 2,MutationObserver 3，setTimeOut(0)）
+
 2,vue依次优先
+
         macrotasks: setTimeout setInterval setImmediate I/O UI渲染
+        
         microtasks: Promise process.nextTick Object.observe MutationObserver
+
         js分成很对task,当task执行完毕，必然执行ui渲染，如果用setTimeout那么UI会渲染两次
+
         优先promise，MutationObserver为微任务，task执行完毕，找到微任务，并执行，UI自渲染一次
+
         MutationObserver实现，查看源码可以知道每次timer都会触发一个DOM更新count=(count+1)%2,DOM更新便会触发回调
 
 ### watcher
+
 计算属性get=>watchers.get  1,给dep.target赋值 2,watcher的value给计算属性缓存 
+
 deep: true 递归watch
+
 immediate: true 在创建watcher时就执行一次handler方法
+
 sync: true 同步，直接执行watcher.run，否则要排队到queue数组中，等到nextTick异步到这里再依次执行
+
 lazy: true 在创建watcher时是否需要立即计算当前watcher的value值，通过computed属性创建的watcher默认lazy=true不需要计算
 
 ### 如何添加依赖
+
 添加依赖主要有三种：computed Watcher,user Watcher,render watcher
+
 请注意Dep.target 静态属性可以表明但前状态为哪种watcher,当get一个值是根据当前状态，添加该watcher为依赖
 
 ### cache（Template）
+
 VUE中使用cancel函数，以template为key,render函数为value,当我们的template没有变化时，能快速的获得render,避免了parse过程，提高了性能
 
 ### 具体代码实现
+
 具体源码解析，请看src目录源码，已尽量给每一句代码添加注释
-如有需要表达不够清晰，或程序BUG，优化，请与我联系(237625092@qq.com)
+如有需要表达不够清楚或建议，请与我联系(237625092@qq.com)
 
 #数据驱动
 “上古时代”我们操作视图的基本步骤是： 
+
 获取 DOM 对象（大多用 jQuery）
+
 获取数据（用任何可能的途径，Ajax 很常见）
+
 用新的数据“修改” DOM 对象，或者用新的数据创建新的 DOM 对象（HTML 字符串／模板＋数据对象）
 更新 DOM
+
 这个时候是不存在所谓“视图层”的——视图有，就是我们看得见摸得着的 DOM，但是没有框架层面的抽象视图层，对于视图的操作基本就是纯手工作坊式的。按照今天的话说这叫：以 DOM 为中心。
 
 这种方式的缺点太多了，其中最重要的有两个：
@@ -228,11 +248,17 @@ VUE中使用cancel函数，以template为key,render函数为value,当我们的te
 
 #相关文档 
 1,基于 John Resig 的 HTML Parser https://johnresig.com/blog/pure-javascript-html-parser/
+
 2,基于 snabbdom 的 Virtual DOM https://github.com/snabbdom/snabbdom
+
 3,VUE API https://cn.vuejs.org/v2/api/
+
 4,VUE 教程教程 https://cn.vuejs.org/v2/guide/
+
 5,VUE官网仓库https://github.com/vuejs
+
 6,VUE路由 https://router.vuejs.org/zh-cn/
+
 7,VUEX  https://vuex.vuejs.org/zh-cn/
 
  

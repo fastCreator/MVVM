@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "726b0de4cd400775633c"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "ddc4ae5881034c0d023a"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -1806,7 +1806,7 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__observer_index__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__observer__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__observer_dep__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__observer_watcher__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(0);
@@ -1832,7 +1832,7 @@ function initData(vm, data) {
         data = data();
     }
     //监听data get(收集依赖)/set(触发更新)
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__observer_index__["a" /* observe */])(data, true);
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__observer__["a" /* observe */])(data, true);
     vm.$data = data;
     var keys = Object.keys(data);
     var i = keys.length;
@@ -3542,7 +3542,7 @@ function TextParser(text, delimiters) {
 /* WEBPACK VAR INJECTION */(function(global) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_observer_watcher__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_instance_initState__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_instance__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_parser__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_vnode__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plugin_directives__ = __webpack_require__(12);
@@ -3574,17 +3574,17 @@ var MVVM = function () {
         this._watchers = [];
         callHook(this, 'beforeCreate');
         if (options.data) {
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance_initState__["a" /* initData */])(this, options.data);
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance__["a" /* initData */])(this, options.data);
         }
 
         if (options.computed) {
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance_initState__["b" /* initComputed */])(this, options.computed);
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance__["b" /* initComputed */])(this, options.computed);
         }
         if (options.watch) {
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance_initState__["c" /* initWatch */])(this, options.watch);
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance__["c" /* initWatch */])(this, options.watch);
         }
         if (options.methods) {
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance_initState__["d" /* initMethods */])(this, options.methods);
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__core_instance__["d" /* initMethods */])(this, options.methods);
         }
         this.$mount(options.el);
         callHook(this, 'created');
