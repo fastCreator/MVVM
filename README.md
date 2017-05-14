@@ -11,6 +11,8 @@
 
 # demo
 
+http://htmlpreview.github.io/?https://github.com/fastCreator/MVVM/blob/master/dist/test.html
+
 # 如何快速实现VUE框架
 Vue 一个 MVVM 框架、一个响应式的组件系统，通过把页面抽象成一个个组件来增加复用性、降低复杂性
 
