@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="MVVM.js"></script></head>
+
+<body>
+  <div id="to">
+
+  </div>
+
+  <script id="app" type="text/html">
+    <div>
+      <h2>绑定</h2>
+      <input value="{{obj}}">
+      <div>{{title}}</div>
+      <br>
+      <hr>
+      <h2>计算属性</h2>
+      <div>{{title2}}</div>
+      <br>
+      <hr>
+      <h2>m-model</h2>
+      <input m-model="arr[0]">
+      <div>{{arr}}</div>
+      <br>
+      <hr>
+      <h2>m-click</h2>
+      <div m-on:click="test">点击触发</div>
+      <br>
+      <hr>
+      <h2>m-if</h2>
+      <h1 m-if="show">显示{{title}}</h1>
+      <button m-on:click="toggle">点击显示/隐藏</button>
+      <br>
+      <hr>
+      <h2>m-for</h2>
+      <ul>
+        <li m-for="(val, key, index) in arr">索引 {{key + 1}} ：{{val}}</li>
+      </ul>
+      <br>
+      <hr>
+      <h2>子组件</h2>
+      <c m-if="cshow" arr></c>
+      <br>
+      <button m-on:click="togglec">点击摧毁/生成子组件</button>
+    </div>
+  </script>
+  <script>
+    var vm = new MVVM({
+      el: '#to',
+      template: '#app',
+      components: {
+        c: {
+          template: "<div><div>{{a}}</div><button m-on:click='showP'>获取父元素arr值</button><div>",
+          data: {
+            a: '我是子组件'
+          },
+          methods: {
+            showP: function () {
+              alert(this.arr);
+            }
+          },
+          beforeCreate: function () {
+            console.log('生成子组件')
+          },
+          beforeDestroy: function () {
+            console.log('子组件被摧毁了')
+          }
+        }
+      },
+      data: {
+        a: true,
+        show: true,
+        cshow: true,
+        title: '标题',
+        obj: { a: { b: 2 } },
+        arr: [1, 0, 3, 4, 5],
+      },
+      computed: {
+        title2: function () {
+          console.log('初次title2');
+          return this.title + 2;
+        },
+        title3: {
+          get: function () {
+            return this.title + 3
+          },
+          set: function (v) {
+            this.title = v - 1
+          }
+        }
+      },
+      watch: {
+        title: function (o, n) {
+          console.log(o, n);
+        },
+        title2: function (o, n) {
+          console.log(o, n);
+        },
+        title3: function (o, n) {
+          console.log(o, n);
+        }
+      },
+      methods: {
+        test: function () {
+          alert(this.title + '点击');
+        },
+        toggle: function () {
+          this.show = !this.show;
+        },
+        togglec: function () {
+          console.log('togglec');
+          this.cshow = !this.cshow;
+        }
+      },
+      beforeCreate: function () {
+        console.log('beforeCreate')
+      },
+      beforeUpdate: function () {
+        console.log('beforeUpdate')
+      },
+      created: function () {
+        console.log('created')
+      }
+    })  
+  </script
+</body>

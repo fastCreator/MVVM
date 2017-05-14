@@ -1,6 +1,6 @@
 import Watcher from './core/observer/watcher'
 import { query, warn, idToTemplate, toString, resolveAsset, hasOwn, isFunction, createElement, remove, bind } from './core/utils'
-import { initData, initComputed, initMethods, initWatch } from './core/instance/initState'
+import { initData, initComputed, initMethods, initWatch } from './core/instance'
 import { compileToFunctions } from './core/parser'
 import { patch, h, VNode } from './core/vnode'
 import { directive } from './plugin/directives'
