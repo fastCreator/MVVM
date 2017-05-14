@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "ddc4ae5881034c0d023a"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "354022ea33308d36d51e"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -3666,7 +3666,6 @@ var MVVM = function () {
     }, {
         key: '$destroy',
         value: function $destroy() {
-            console.log('$destroy');
             var vm = this;
             callHook(this, 'beforeDestroy');
             if (this.$parent) {
@@ -3682,7 +3681,7 @@ var MVVM = function () {
             if (vm.$data.__ob__) {
                 vm.$data.__ob__.vmCount--;
             }
-            vm._patch(this.$el, { key: this._uid });
+            vm._patch(this.$el, { text: '' });
             callHook(vm, 'destroyed');
             vm.$off();
         }
@@ -3707,18 +3706,9 @@ var MVVM = function () {
             }
             var prevVnode = this._vnode;
             this._vnode = vnode;
-
             if (!prevVnode) {
-                vnode.key = this._uid;
-                // this.$el.hook={};
-                // this.$el.hook.destroy = () => {
-                //     console.log('2');
-                //     componentVm && componentVm.$destroy();
-                // }
                 this.$el = this._patch(this.$el, vnode);
             } else {
-                //vnode.key = this._uid;
-                prevVnode.key = this._uid;
                 this.$el = this._patch(prevVnode, vnode);
             }
             if (this._isMounted) {
@@ -3740,7 +3730,6 @@ var MVVM = function () {
             data.hook = data.hook || {};
 
             if (this.$options.destroy) {
-                alert('xxxxx');
                 data.hook.destroy = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__core_utils__["f" /* bind */])(this.$options.destroy, this);
             }
 
@@ -3761,7 +3750,6 @@ var MVVM = function () {
             if (typeof sel == 'string') {
                 var Ctor = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__core_utils__["g" /* resolveAsset */])(this.$options, 'components', sel);
                 if (Ctor) {
-                    console.log(Ctor);
                     return this._createComponent(Ctor, data, children, sel);
                 }
             }
@@ -3777,15 +3765,16 @@ var MVVM = function () {
             var _this = this;
 
             Ctor.data = mergeOptions(Ctor.data);
-            console.log('1');
             var componentVm = void 0;
             var Factory = this.constructor;
             var parentData = this.$data;
             data.hook.insert = function (vnode) {
-                console.log('插入');
                 Ctor.data = Ctor.data || {};
-                Ctor.el = vnode.elm;
+                var el = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__core_utils__["h" /* createElement */])('sel');
+                vnode.elm.append(el);
+                Ctor.el = el;
                 componentVm = new Factory(Ctor);
+                vnode.key = componentVm.uid;
                 componentVm._isComponent = true;
                 componentVm.$parent = _this;
                 (_this.$children || (_this.$children = [])).push(componentVm);
@@ -3811,7 +3800,6 @@ var MVVM = function () {
                     if (_ret === 'continue') continue;
                 }
             };
-
             Ctor._vnode = new __WEBPACK_IMPORTED_MODULE_4__core_vnode__["c" /* VNode */](sel, data, [], undefined, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__core_utils__["h" /* createElement */])(sel));
             return Ctor._vnode;
         }
@@ -4032,6 +4020,7 @@ var directiveIf = {
     template2Vnode: function template2Vnode(el, directive) {},
     vnode2render: function vnode2render(el, genElement) {
         var exp = el.if.expression;
+        //if (el.isComponent) return `${genElement(el)}`;
         return exp + "?" + genElement(el) + ":''";
     }
 };

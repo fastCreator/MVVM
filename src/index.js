@@ -11,7 +11,7 @@ export default class MVVM {
     constructor(options) {
         this.$options = options;
         this.$options.delimiters = this.$options.delimiters || ["{{", "}}"]
-        this._uid = uid++;
+        this._uid = uid++; 
         this._watchers = [];
         callHook(this, 'beforeCreate')
         if (options.data) {
@@ -35,7 +35,7 @@ export default class MVVM {
     static use(plugin) {
         plugin && plugin.install && plugin.install.call(this, MVVM);
     }
-    static $set(target, key, val) {
+    static $set(target, key, val) { 
         if (Array.isArray(target) && Number(key) !== NaN) {
             target.length = Math.max(target.length, key)
             target.splice(key, 1, val)
@@ -143,8 +143,7 @@ export default class MVVM {
     $forceUpdate() {
         return this._render()
     }
-    $destroy() {
-        console.log('$destroy');
+    $destroy() { 
         const vm = this
         callHook(this, 'beforeDestroy');
         if (this.$parent) {
@@ -160,7 +159,7 @@ export default class MVVM {
         if (vm.$data.__ob__) {
             vm.$data.__ob__.vmCount--
         }
-        vm._patch(this.$el, { key: this._uid });
+        vm._patch(this.$el, { text:''});
         callHook(vm, 'destroyed');
         vm.$off();
     }
@@ -177,26 +176,17 @@ export default class MVVM {
         }
         return vnode
     }
-    _update(vnode) {
+    _update(vnode) { 
         if (this._isMounted) {
             callHook(this, 'beforeUpdate')
         }
         const prevVnode = this._vnode
-        this._vnode = vnode;
-
-        if (!prevVnode) {
-            vnode.key = this._uid;
-            // this.$el.hook={};
-            // this.$el.hook.destroy = () => {
-            //     console.log('2');
-            //     componentVm && componentVm.$destroy();
-            // }
+        this._vnode = vnode; 
+        if (!prevVnode) { 
             this.$el = this._patch(this.$el, vnode)
-        } else {
-            //vnode.key = this._uid;
-            prevVnode.key = this._uid;
+        } else { 
             this.$el = this._patch(prevVnode, vnode)
-        }
+        } 
         if (this._isMounted) {
             callHook(this, 'updated')
         }
@@ -212,8 +202,7 @@ export default class MVVM {
 
         data.hook = data.hook || {}
 
-        if (this.$options.destroy) {
-            alert('xxxxx');
+        if (this.$options.destroy) { 
             data.hook.destroy = bind(this.$options.destroy, this)
         }
 
@@ -233,8 +222,7 @@ export default class MVVM {
 
         if (typeof sel == 'string') {
             let Ctor = resolveAsset(this.$options, 'components', sel)
-            if (Ctor) {
-                console.log(Ctor);
+            if (Ctor) { 
                 return this._createComponent(Ctor, data, children, sel)
             }
         }
@@ -244,16 +232,17 @@ export default class MVVM {
     //创建组件
     //子组件option,属性,子元素,tag
     _createComponent(Ctor, data, children, sel) {
-        Ctor.data = mergeOptions(Ctor.data);
-        console.log('1')
+        Ctor.data = mergeOptions(Ctor.data); 
         let componentVm;
         let Factory = this.constructor
         let parentData = this.$data
-        data.hook.insert = (vnode) => {
-            console.log('插入');
+        data.hook.insert = (vnode) => { 
             Ctor.data = Ctor.data || {};
-            Ctor.el = vnode.elm;
+            var el =createElement('sel')
+            vnode.elm.append(el)
+            Ctor.el = el;
             componentVm = new Factory(Ctor);
+            vnode.key = componentVm.uid;
             componentVm._isComponent = true
             componentVm.$parent = this;
             (this.$children || (this.$children = [])).push(componentVm);
@@ -271,9 +260,8 @@ export default class MVVM {
                     }
                 })
             }
-        }
-
-        Ctor._vnode = new VNode(sel, data, [], undefined,createElement(sel));
+        } 
+        Ctor._vnode = new VNode(sel, data, [], undefined, createElement(sel)); 
         return Ctor._vnode
     }
     //渲染for时,返回多个render

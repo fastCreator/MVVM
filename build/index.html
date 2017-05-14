@@ -53,7 +53,11 @@
       template: '#app',
       components: {
         c: {
-          template: "<div><div>{{a}}</div><button m-on:click='showP'>获取父元素arr值</button><div>",
+          template: `<div style="background:#ccc;padding:15px">
+          <div>{{a}}</div>
+          <input m-model="a">
+          <button m-on:click='showP'>获取父元素arr值</button>
+          </div>`,
           data: {
             a: '我是子组件'
           },
@@ -73,7 +77,7 @@
       data: {
         a: true,
         show: true,
-        cshow: true,
+        cshow: false,
         title: '标题',
         obj: { a: { b: 2 } },
         arr: [1, 0, 3, 4, 5],
