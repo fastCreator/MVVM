@@ -10,6 +10,7 @@
 6，更少的代码，VUE.use 以插件的形式，方便用户扩展与选择
 
 # demo
+gitdemo 网络不行，请刷新几下，耐心等待10S
 
 http://htmlpreview.github.io/?https://github.com/fastCreator/MVVM/blob/master/dist/test.html
 
