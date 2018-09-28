@@ -1,13 +1,13 @@
 # 起源
 最开始学习VUE的时候，网上找了很多源码解析，大多不够详尽或难以理解，于是自己写了一个类似VUE的框架（MVVM），整合网上解析与自己理解，尽量给每一句代码，添加解释,配备图形解释，让VUE通俗易懂；
 
-#为什么用VUE
-1，它能让团队书写用js更容易并且简化了js，上手难度低
-2，优异的文档，一个帮组每一个人学习的强大社区，一个配套库的支持  https://cn.vuejs.org/
-3，MVVM数据驱动,解放DOM操作
-4，webpack=>vue-loader=>.vue文件;优秀的模块化解决方案
-5，高效的性能,Virtual DOM + 基于es5的observe
-6，更少的代码，VUE.use 以插件的形式，方便用户扩展与选择
+# 为什么用VUE
+1. 它能让团队书写用js更容易并且简化了js，上手难度低
+2. 优异的文档，一个帮组每一个人学习的强大社区，一个配套库的支持  https://cn.vuejs.org/
+3. MVVM数据驱动,解放DOM操作
+4. webpack=>vue-loader=>.vue文件;优秀的模块化解决方案
+5. 高效的性能,Virtual DOM + 基于es5的observe
+6. 更少的代码，VUE.use 以插件的形式，方便用户扩展与选择
 
 # demo
 gitdemo 网络不行，请刷新几下，耐心等待10S
@@ -41,7 +41,7 @@ Vue 2.0 底层基于 Snabbdom 这个 Virtual DOM 做了优化与整合
 这个库的主要特色是简单、模块化方便扩展与出色的性能
 
 一个简单例子
-```bash
+```javascript
 var snabbdom = require("snabbdom");
 var patch = snabbdom.init([ // 初始化补丁功能与选定的模块
   require("snabbdom/modules/class").default, // 使切换class变得容易
@@ -85,7 +85,7 @@ patch(vnode, newVnode); // Snabbdom efficiently updates the old view to the new 
 Vue 2.0 的 Parse 原型基于 John Resig 的 HTML Parser，这个 Parser 写的很小巧，可以到这里了解 http://ejohn.org/blog/pure-javascript-html-parser/
 
 基本的 HTML 解析用法
-```bash
+```javascript
 var results = "";
 
 HTMLParser(html, {
@@ -116,7 +116,7 @@ return results;
 下面在说下响应系统
 
 数据响应主要是依据 ES5 的 getter 与 setter 来做数据变化的钩子处理，比如下面
-```bash
+```javascript
 Object.defineProperty(obj, key, {
   enumerable: true,
   configurable: true,
@@ -135,7 +135,7 @@ Object.defineProperty(obj, key, {
 这样取值与赋值的过程中都可以做一些我们自己的处理，比如 set 的时候我们可以判断值是否真的发生了变化，变化了可以触发我们的重新渲染函数，做虚拟 DOM 比对处理更新界面
 
 不过说明下并不是一旦有数据变动我们就要做重新渲染，看这个例子
-```bash
+```javascript
  new Vue({
       template: `
         <div>
@@ -180,9 +180,9 @@ Object.defineProperty(obj, key, {
 
 ## 部分源码解析
 ### nextTick
-1,实现方法（1,promise 2,MutationObserver 3，setTimeOut(0)）
+1. 实现方法（1,promise 2,MutationObserver 3，setTimeOut(0)）
 
-2,vue依次优先
+2. vue依次优先
 
         macrotasks: setTimeout setInterval setImmediate I/O UI渲染
         
@@ -245,23 +245,23 @@ VUE中使用cancel函数，以template为key,render函数为value,当我们的te
 
 这就是数据驱动视图，你关注数据，框架替你处理视图操作。
 
-#结语
+# 结语
 希望大家看了本文能实现一个简单的MVVM
 当然实现一个完整的东西还是有很多路要走的，希望大家都能越走越远，也能越走越近~
 
-#相关文档 
-1,基于 John Resig 的 HTML Parser https://johnresig.com/blog/pure-javascript-html-parser/
+# 相关文档 
+1. 基于 John Resig 的 HTML Parser https://johnresig.com/blog/pure-javascript-html-parser/
 
-2,基于 snabbdom 的 Virtual DOM https://github.com/snabbdom/snabbdom
+2. 基于 snabbdom 的 Virtual DOM https://github.com/snabbdom/snabbdom
 
-3,VUE API https://cn.vuejs.org/v2/api/
+3. VUE API https://cn.vuejs.org/v2/api/
 
-4,VUE 教程教程 https://cn.vuejs.org/v2/guide/
+4. VUE 教程教程 https://cn.vuejs.org/v2/guide/
 
-5,VUE官网仓库https://github.com/vuejs
+5. VUE官网仓库https://github.com/vuejs
 
-6,VUE路由 https://router.vuejs.org/zh-cn/
+6. VUE路由 https://router.vuejs.org/zh-cn/
 
-7,VUEX  https://vuex.vuejs.org/zh-cn/
+7. VUEX  https://vuex.vuejs.org/zh-cn/
 
  
